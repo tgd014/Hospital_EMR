@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Hospital EMR{% endblock %}</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        .header {
+            background-color: #1f4e79;
+            color: white;
+            padding: 18px 40px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hospital-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .user-area {
+            font-size: 14px;
+        }
+
+        .user-area a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .user-area a:hover {
+            text-decoration: underline;
+        }
+
+        .nav {
+            background-color: #163a5c;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 14px 18px;
+            font-size: 14px;
+        }
+
+        .nav a:hover {
+            background-color: #245b87;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="header">
+
+        <div class="header-top">
+
+            <div>
+                <div class="hospital-name">
+                    Hospital EMR
+                </div>
+            </div>
+
+            <div class="user-area">
+
+                Logged in as:
+                <strong>{{ request.user.username }}</strong>
+
+                <a href="/accounts/logout/">
+                    Logout
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <nav class="nav">
+
+        <a href="/dashboard/">
+            Dashboard
+        </a>
+
+        <a href="/patients/">
+            Patients
+        </a>
+
+        <a href="/patients/new/">
+            Register Patient
+        </a>
+
+    </nav>
+
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>

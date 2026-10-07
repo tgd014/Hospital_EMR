@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard - Hospital EMR
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h2 style="margin-top: 0;">Dashboard</h2>
+
+    <p>
+        Welcome to the Hospital EMR system.
+    </p>
+
+
+    <div style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 25px;
+    ">
+
+        <!-- Patients -->
+
+        <a
+            href="/patients/"
+            style="
+                background: white;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                text-decoration: none;
+                color: #333;
+            "
+        >
+
+            <div style="
+                font-size: 14px;
+                color: #777;
+            ">
+                Patients
+            </div>
+
+            <div style="
+                font-size: 32px;
+                font-weight: bold;
+                color: #1f4e79;
+                margin-top: 8px;
+            ">
+                {{ patient_count }}
+            </div>
+
+            <div style="
+                margin-top: 10px;
+                color: #1f4e79;
+                font-size: 14px;
+            ">
+                View Patients →
+            </div>
+
+        </a>
+
+
+        <!-- Encounters -->
+
+        <div
+            style="
+                background: white;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            "
+        >
+
+            <div style="
+                font-size: 14px;
+                color: #777;
+            ">
+                Encounters
+            </div>
+
+            <div style="
+                font-size: 32px;
+                font-weight: bold;
+                color: #1f4e79;
+                margin-top: 8px;
+            ">
+                {{ encounter_count }}
+            </div>
+
+            <div style="
+                margin-top: 10px;
+                color: #777;
+                font-size: 14px;
+            ">
+                Patient encounters
+            </div>
+
+        </div>
+
+
+        <!-- Appointments -->
+
+        <div
+            style="
+                background: white;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            "
+        >
+
+            <div style="
+                font-size: 14px;
+                color: #777;
+            ">
+                Appointments
+            </div>
+
+            <div style="
+                font-size: 32px;
+                font-weight: bold;
+                color: #1f4e79;
+                margin-top: 8px;
+            ">
+                0
+            </div>
+
+            <div style="
+                margin-top: 10px;
+                color: #777;
+                font-size: 14px;
+            ">
+                No appointments yet
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Quick Actions -->
+
+    <div style="
+        background: white;
+        margin-top: 30px;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+
+        <h3 style="
+            margin-top: 0;
+            color: #1f4e79;
+        ">
+            Quick Actions
+        </h3>
+
+        <div style="
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        ">
+
+            <a
+                href="/patients/"
+                style="
+                    background-color: #1f4e79;
+                    color: white;
+                    text-decoration: none;
+                    padding: 11px 18px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                "
+            >
+                View Patients
+            </a>
+
+            <a
+                href="/patients/new/"
+                style="
+                    background-color: #198754;
+                    color: white;
+                    text-decoration: none;
+                    padding: 11px 18px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                "
+            >
+                Register Patient
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

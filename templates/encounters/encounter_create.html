@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>New Encounter - Hospital EMR</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        .header {
+            background-color: #1f4e79;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            color: #1f4e79;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .card {
+            background-color: white;
+            margin-top: 20px;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #1f4e79;
+        }
+
+        .patient-name {
+            background-color: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .patient-name strong {
+            font-size: 18px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .field select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 15px;
+            background-color: white;
+        }
+
+        .info-box {
+            background-color: #eef5fb;
+            border-left: 4px solid #1f4e79;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .start-button {
+            background-color: #198754;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .start-button:hover {
+            background-color: #157347;
+        }
+
+        .cancel-button {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        .cancel-button:hover {
+            background-color: #5c636a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Hospital EMR</h1>
+        <p>Electronic Medical Record System</p>
+    </div>
+
+    <div class="container">
+
+        <a
+            href="/patients/{{ patient.id }}/"
+            class="back-link"
+        >
+            ← Back to Patient Chart
+        </a>
+
+        <div class="card">
+
+            <h2>Start New Encounter</h2>
+
+            <div class="patient-name">
+                <strong>
+                    {{ patient.first_name }}
+
+                    {% if patient.middle_name %}
+                        {{ patient.middle_name }}
+                    {% endif %}
+
+                    {{ patient.last_name }}
+                </strong>
+
+                <br>
+
+                <span>
+                    MRN: {{ patient.medical_record_number }}
+                </span>
+            </div>
+
+            <div class="info-box">
+                You are starting a new outpatient encounter for this patient.
+                The encounter will be created with an <strong>Open</strong>
+                status.
+            </div>
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="field">
+
+                    <label for="encounter_type">
+                        Encounter Type
+                    </label>
+
+                    <select
+                        id="encounter_type"
+                        name="encounter_type"
+                    >
+                        <option value="outpatient">
+                            Outpatient
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="buttons">
+
+                    <button
+                        type="submit"
+                        class="start-button"
+                    >
+                        Start Encounter
+                    </button>
+
+                    <a
+                        href="/patients/{{ patient.id }}/"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

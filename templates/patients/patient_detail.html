@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ patient.first_name }} {{ patient.last_name }} - Hospital EMR</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        .header {
+            background-color: #1f4e79;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            color: #1f4e79;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .patient-header {
+            background: white;
+            margin-top: 20px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .patient-header h2 {
+            margin: 0 0 5px;
+            font-size: 28px;
+        }
+
+        .mrn {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section {
+            background: white;
+            margin-top: 20px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section h3 {
+            margin: 0;
+            color: #1f4e79;
+            font-size: 20px;
+        }
+
+        .new-encounter-button {
+            background-color: #198754;
+            color: white;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .new-encounter-button:hover {
+            background-color: #157347;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background-color: #f8fafc;
+            border-radius: 5px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .encounter {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .encounter:last-child {
+            margin-bottom: 0;
+        }
+
+        .encounter strong {
+            color: #1f4e79;
+        }
+
+        .empty {
+            color: #777;
+            padding: 10px 0;
+        }
+
+        @media (max-width: 700px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                align-items: flex-start;
+                gap: 15px;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Hospital EMR</h1>
+        <p>Electronic Medical Record System</p>
+    </div>
+
+    <div class="container">
+
+        <a href="/patients/" class="back-link">
+            ← Back to Patients
+        </a>
+
+        <!-- Patient Header -->
+        <div class="patient-header">
+
+            <h2>
+                {{ patient.first_name }}
+
+                {% if patient.middle_name %}
+                    {{ patient.middle_name }}
+                {% endif %}
+
+                {{ patient.last_name }}
+            </h2>
+
+            <div class="mrn">
+                Medical Record Number:
+                {{ patient.medical_record_number }}
+            </div>
+
+        </div>
+
+
+        <!-- Patient Information -->
+        <div class="section">
+
+            <div class="section-header">
+                <h3>Patient Information</h3>
+            </div>
+
+            <div class="info-grid">
+
+                <div class="info-item">
+                    <div class="label">First Name</div>
+                    <div class="value">
+                        {{ patient.first_name }}
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="label">Middle Name</div>
+                    <div class="value">
+
+                        {% if patient.middle_name %}
+                            {{ patient.middle_name }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="label">Last Name</div>
+                    <div class="value">
+                        {{ patient.last_name }}
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="label">Date of Birth</div>
+                    <div class="value">
+                        {{ patient.date_of_birth }}
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="label">Phone</div>
+                    <div class="value">
+
+                        {% if patient.phone %}
+                            {{ patient.phone }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="label">Email</div>
+                    <div class="value">
+
+                        {% if patient.email %}
+                            {{ patient.email }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="label">Address</div>
+                    <div class="value">
+
+                        {% if patient.address %}
+                            {{ patient.address }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Encounters -->
+        <div class="section">
+
+            <div class="section-header">
+
+                <h3>Encounters</h3>
+
+                <a
+                    href="/patients/{{ patient.id }}/encounters/new/"
+                    class="new-encounter-button"
+                >
+                    + Start New Encounter
+                </a>
+
+            </div>
+
+
+            {% if encounters %}
+
+                {% for encounter in encounters %}
+
+                    <div class="encounter">
+
+                        <strong>
+                            {{ encounter.get_encounter_type_display }}
+                        </strong>
+
+                        <br>
+
+                        Date:
+                        {{ encounter.started_at }}
+
+                        <br>
+
+                        Status:
+                        {{ encounter.get_status_display }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty">
+                    No encounters have been recorded for this patient.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</body>
+</html>
