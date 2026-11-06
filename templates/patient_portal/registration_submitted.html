@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Submitted</title>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #E8F0EB;
+            font-family: Arial, sans-serif;
+            color: #263C34;
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(36, 79, 67, 0.10);
+        }
+
+        .check {
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: #E8F0EB;
+            color: #244F43;
+            font-size: 36px;
+            line-height: 65px;
+        }
+
+        h1 {
+            color: #244F43;
+        }
+
+        p {
+            line-height: 1.7;
+            color: #68766E;
+        }
+
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #244F43;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <div class="check">&#10003;</div>
+
+        <h1>Request Submitted</h1>
+
+        <p>
+            Your patient portal registration request has been submitted.
+            Hospital staff must verify your identity and link your
+            account to your medical record before you can sign in.
+        </p>
+
+        <p>
+            Your account is not active yet. Please contact the hospital
+            if you need assistance.
+        </p>
+
+        <a href="{% url 'login' %}">Return to Login</a>
+    </div>
+</body>
+</html>

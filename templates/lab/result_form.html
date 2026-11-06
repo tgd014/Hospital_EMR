@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Lab Result | Hospital EMR</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #263445; margin: 0; }
+        header { background: #17365d; color: white; padding: 20px 28px; }
+        main { max-width: 850px; margin: 28px auto; padding: 0 20px; }
+        .panel { background: white; padding: 24px; border-radius: 8px; }
+        .field { margin-bottom: 17px; }
+        label { display: block; font-weight: bold; margin-bottom: 7px; }
+        input, select, textarea { box-sizing: border-box; width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 5px; font: inherit; }
+        textarea { min-height: 90px; }
+        .button { padding: 11px 16px; border: 0; border-radius: 5px; background: #176b87; color: white; cursor: pointer; font-size: 15px; }
+        .back { color: white; }
+        .error { background: #fee2e2; padding: 12px; color: #991b1b; border-radius: 5px; margin-bottom: 16px; }
+        .notice { background: #fff7ed; padding: 12px; border-radius: 5px; margin-bottom: 18px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Enter Laboratory Result</h1>
+    <a class="back" href="{% url 'lab_worklist' %}">← Back to Worklist</a>
+</header>
+<main>
+    <section class="panel">
+        <h2>{{ test_order.test_name }}</h2>
+        <p><strong>Patient:</strong> {{ test_order.encounter.patient }}</p>
+        <p><strong>Medical Record No.:</strong> {{ test_order.encounter.patient.medical_record_number }}</p>
+        <p><strong>Priority:</strong> {{ test_order.get_priority_display }}</p>
+        <p><strong>Ordered:</strong> {{ test_order.ordered_at|date:"Y-m-d H:i" }}</p>
+
+        <div class="notice">
+            Submitting this form finalizes the result immediately. Check the patient and values before submitting.
+        </div>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="field">
+                <label for="result_type">Result Type</label>
+                <select id="result_type" name="result_type" required>
+                    {% for value, label in result_types %}
+                        <option value="{{ value }}" {% if result.result_type == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="result_value">Result Value / Finding</label>
+                <textarea id="result_value" name="result_value" required>{{ result.result_value|default:"" }}</textarea>
+            </div>
+
+            <div class="field">
+                <label for="units">Units (if applicable)</label>
+                <input id="units" name="units" value="{{ result.units|default:'' }}" placeholder="e.g. mg/dL">
+            </div>
+
+            <div class="field">
+                <label for="reference_range">Reference Range</label>
+                <input id="reference_range" name="reference_range" value="{{ result.reference_range|default:'' }}" placeholder="e.g. 70–100 mg/dL">
+            </div>
+
+            <div class="field">
+                <label for="abnormal_flag">Interpretation</label>
+                <select id="abnormal_flag" name="abnormal_flag">
+                    {% for value, label in abnormal_flags %}
+                        <option value="{{ value }}" {% if result.abnormal_flag == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="specimen_type">Specimen Type</label>
+                <input id="specimen_type" name="specimen_type" value="{{ result.specimen_type|default:'' }}" placeholder="e.g. Blood, urine, sputum">
+            </div>
+
+            <div class="field">
+                <label for="specimen_id">Specimen ID / Accession Number</label>
+                <input id="specimen_id" name="specimen_id" value="{{ result.specimen_id|default:'' }}">
+            </div>
+
+            <div class="field">
+                <label for="comments">Lab Comments</label>
+                <textarea id="comments" name="comments">{{ result.comments|default:"" }}</textarea>
+            </div>
+
+            <button class="button" type="submit">Submit Final Result</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>
+{% endblock %}

@@ -1,19 +1,246 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Access Denied - Hospital EMR</title>
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block title %}Access Restricted - Hospital EMR{% endblock %}
 
-    <h1>Access Denied</h1>
+{% block extra_css %}
+<style>
+    .denied-page {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 36px 20px;
+        box-sizing: border-box;
+    }
 
-    <p>{{ message }}</p>
+    .denied-card {
+        width: 100%;
+        max-width: 620px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+        text-align: center;
+    }
 
-    <a href="/dashboard/">Return to Dashboard</a>
+    .denied-accent {
+        height: 6px;
+        background: linear-gradient(90deg, #1f4e79, #4f83b4);
+    }
 
-</body>
+    .denied-content {
+        padding: 42px 36px;
+    }
 
-</html>
+    .denied-icon {
+        width: 94px;
+        height: 94px;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #1f4e79;
+    }
+
+    .denied-label {
+        display: inline-block;
+        background: #fef2f2;
+        color: #b91c1c;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+    }
+
+    .denied-title {
+        margin: 0 0 14px;
+        color: #163a5c;
+        font-size: 30px;
+        line-height: 1.25;
+    }
+
+    .denied-description {
+        color: #64748b;
+        font-size: 16px;
+        line-height: 1.8;
+        margin: 0 auto 26px;
+        max-width: 470px;
+    }
+
+    .denied-notice {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 16px;
+        margin: 0 0 28px;
+        color: #475569;
+        font-size: 14px;
+        line-height: 1.7;
+        text-align: left;
+    }
+
+    .denied-notice strong {
+        display: block;
+        color: #334155;
+        margin-bottom: 4px;
+    }
+
+    .denied-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .denied-button {
+        display: inline-block;
+        padding: 13px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .denied-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .denied-button-primary {
+        background: #1f4e79;
+        color: #ffffff;
+    }
+
+    .denied-button-primary:hover {
+        background: #163a5c;
+    }
+
+    .denied-button-secondary {
+        background: #ffffff;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+    }
+
+    .denied-button-secondary:hover {
+        background: #f8fafc;
+    }
+
+    .denied-footer {
+        border-top: 1px solid #e2e8f0;
+        padding: 18px 24px;
+        background: #fafcff;
+        color: #94a3b8;
+        font-size: 12px;
+    }
+
+    @media (max-width: 520px) {
+        .denied-content {
+            padding: 32px 22px;
+        }
+
+        .denied-title {
+            font-size: 25px;
+        }
+
+        .denied-actions {
+            flex-direction: column;
+        }
+
+        .denied-button {
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="denied-page">
+
+    <main class="denied-card">
+
+        <div class="denied-accent"></div>
+
+        <div class="denied-content">
+
+            <div class="denied-icon" aria-hidden="true">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                    <path d="M12 14v3"></path>
+                </svg>
+
+            </div>
+
+            <div class="denied-label">
+                Access restricted
+            </div>
+
+            <h1 class="denied-title">
+                You don't have access
+            </h1>
+
+            <p class="denied-description">
+                Your account does not currently have permission to open this
+                page or perform this action. Your hospital records and other
+                areas of the system remain subject to your assigned role.
+            </p>
+
+            <div class="denied-notice">
+
+                <strong>What should you do?</strong>
+
+                Return to your dashboard and continue with the features
+                available to your account. If you believe you need access
+                to this page for your work, contact your hospital's EMR
+                administrator to review your role permissions.
+
+            </div>
+
+            <div class="denied-actions">
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="denied-button denied-button-primary"
+                >
+                    Return to Dashboard
+                </a>
+
+                <a
+                    href="{% url 'patient_list' %}"
+                    class="denied-button denied-button-secondary"
+                >
+                    View Patients
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="denied-footer">
+            Hospital EMR &bull; Secure access to clinical information
+        </div>
+
+    </main>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,402 @@
+
+{% extends "base.html" %}
+
+{% block title %}Review Patient Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .review-page {
+        max-width: 1240px;
+        margin: 0 auto;
+        padding: 32px 24px 48px;
+    }
+
+    .review-header {
+        margin-bottom: 30px;
+    }
+
+    .review-eyebrow {
+        color: #1f4e79;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 9px;
+    }
+
+    .review-title {
+        color: #163a5c;
+        font-size: 30px;
+        line-height: 1.25;
+        margin: 0 0 10px;
+    }
+
+    .review-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+        margin: 0;
+        max-width: 700px;
+    }
+
+    .review-section {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .review-section-title {
+        color: #163a5c;
+        font-size: 20px;
+        margin: 0 0 7px;
+    }
+
+    .review-section-description {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.7;
+        margin: 0 0 18px;
+    }
+
+    .detail-row {
+        display: grid;
+        grid-template-columns: 190px minmax(0, 1fr);
+        gap: 16px;
+        padding: 13px 0;
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .detail-label {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        color: #163a5c;
+        overflow-wrap: anywhere;
+    }
+
+    .warning {
+        background: #fff7e5;
+        border: 1px solid #f2dfb1;
+        border-left: 4px solid #d69b26;
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin: 20px 0;
+        color: #76551b;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .warning strong {
+        display: block;
+        margin-bottom: 5px;
+        color: #684713;
+    }
+
+    .field-label {
+        display: block;
+        color: #163a5c;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .patient-select {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #334155;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    .patient-select:focus {
+        outline: 3px solid #dbeafe;
+        border-color: #1f4e79;
+    }
+
+    .form-help {
+        color: #64748b;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-top: 8px;
+    }
+
+    .review-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .action-button {
+        display: inline-block;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.18s ease, transform 0.18s ease;
+    }
+
+    .action-button:hover {
+        transform: translateY(-1px);
+    }
+
+    .approve-button {
+        background: #1f4e79;
+        color: #ffffff;
+    }
+
+    .approve-button:hover {
+        background: #163a5c;
+    }
+
+    .reject-button {
+        background: #fff1f2;
+        color: #a52a2a;
+        border: 1px solid #fecdd3;
+    }
+
+    .reject-button:hover {
+        background: #ffe4e6;
+    }
+
+    .back-link {
+        display: inline-block;
+        color: #1f4e79;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        margin-top: 4px;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+        .review-page {
+            padding: 24px 16px 36px;
+        }
+
+        .review-title {
+            font-size: 25px;
+        }
+
+        .review-section {
+            padding: 18px;
+        }
+
+        .detail-row {
+            grid-template-columns: 1fr;
+            gap: 4px;
+        }
+
+        .review-actions {
+            flex-direction: column;
+        }
+
+        .action-button {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<main class="review-page">
+
+    <header class="review-header">
+        <div class="review-eyebrow">Hospital EMR</div>
+
+        <h1 class="review-title">
+            Review Patient Registration
+        </h1>
+
+        <p class="review-subtitle">
+            Review the applicant's information, verify their identity,
+            and link their account to the correct hospital patient record.
+        </p>
+    </header>
+
+    <section class="review-section">
+
+        <h2 class="review-section-title">
+            Applicant Information
+        </h2>
+
+        <p class="review-section-description">
+            Registration details submitted by the applicant.
+        </p>
+
+        <div class="detail-row">
+            <span class="detail-label">Full Name</span>
+            <span class="detail-value">
+                {{ registration.first_name }}
+                {{ registration.middle_name }}
+                {{ registration.last_name }}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Date of Birth</span>
+            <span class="detail-value">
+                {{ registration.date_of_birth|date:"d M Y" }}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Email Address</span>
+            <span class="detail-value">
+                {{ registration.email }}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Phone Number</span>
+            <span class="detail-value">
+                {{ registration.phone }}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Username</span>
+            <span class="detail-value">
+                {{ registration.user.username }}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">MRN Provided</span>
+            <span class="detail-value">
+                {{ registration.medical_record_number|default:"Not provided" }}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Submitted</span>
+            <span class="detail-value">
+                {{ registration.submitted_at|date:"d M Y H:i" }}
+            </span>
+        </div>
+
+    </section>
+
+    <div class="warning">
+        <strong>Identity verification required</strong>
+        Confirm the applicant's identity using the hospital's approved
+        verification procedure before selecting a patient record.
+        The submitted MRN alone is not proof of identity.
+    </div>
+
+    <section class="review-section">
+
+        <h2 class="review-section-title">
+            Link to Existing Patient Record
+        </h2>
+
+        <p class="review-section-description">
+            Select the existing patient record only after completing
+            identity verification.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label class="field-label" for="patient_id">
+                Verified Patient Record
+            </label>
+
+            <select
+                name="patient_id"
+                id="patient_id"
+                class="patient-select"
+                required
+            >
+                <option value="">Choose a patient record</option>
+
+                {% for patient in patients %}
+                    <option value="{{ patient.id }}">
+                        {{ patient.medical_record_number }}
+                        — {{ patient.first_name }}
+                        {{ patient.last_name }}
+                        — DOB: {{ patient.date_of_birth|date:"d M Y" }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <p class="form-help">
+                Double-check the patient's name, date of birth, and
+                medical record number before approving the account.
+            </p>
+
+            <div class="review-actions">
+                <button
+                    type="submit"
+                    name="action"
+                    value="approve"
+                    class="action-button approve-button"
+                >
+                    Verify and Approve Account
+                </button>
+            </div>
+        </form>
+
+    </section>
+
+    <section class="review-section">
+
+        <h2 class="review-section-title">
+            Reject Registration
+        </h2>
+
+        <p class="review-section-description">
+            Use this action if the application cannot be verified
+            or should not be approved.
+        </p>
+
+        <form
+            method="post"
+            onsubmit="return confirm('Are you sure you want to reject this registration request?');"
+        >
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                name="action"
+                value="reject"
+                class="action-button reject-button"
+            >
+                Reject Registration
+            </button>
+        </form>
+
+    </section>
+
+    <a
+        class="back-link"
+        href="{% url 'patient_registration_requests' %}"
+    >
+        &larr; Back to Registration Requests
+    </a>
+
+</main>
+
+{% endblock %}

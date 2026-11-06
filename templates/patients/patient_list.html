@@ -1,208 +1,181 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patients - Hospital EMR</title>
+{% extends "base.html" %}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            color: #333;
-        }
+{% block title %}
+Patients - Hospital EMR
+{% endblock %}
 
-        .header {
-            background-color: #1f4e79;
-            color: white;
-            padding: 20px 40px;
-        }
+{% block content %}
 
-        .header h1 {
-            margin: 0;
-            font-size: 26px;
-        }
+<div class="container">
 
-        .header p {
-            margin: 5px 0 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
+    <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    ">
 
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+        <h2 style="margin: 0;">
+            Patients
+        </h2>
 
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
+        {% if can_create_patients %}
 
-        .top-bar h2 {
-            margin: 0;
-            font-size: 24px;
-        }
+            <a
+                href="/patients/new/"
+                style="
+                    background-color: #198754;
+                    color: white;
+                    text-decoration: none;
+                    padding: 11px 18px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                "
+            >
+                + Register Patient
+            </a>
 
-        .add-button {
-            background-color: #198754;
-            color: white;
-            text-decoration: none;
-            padding: 11px 18px;
-            border-radius: 6px;
-            font-weight: bold;
-        }
+        {% endif %}
 
-        .add-button:hover {
-            background-color: #157347;
-        }
-
-        .table-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th {
-            background-color: #e9eef3;
-            text-align: left;
-            padding: 14px;
-            font-size: 14px;
-        }
-
-        td {
-            padding: 14px;
-            border-top: 1px solid #eee;
-            font-size: 14px;
-        }
-
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .patient-link {
-            color: #1f4e79;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .patient-link:hover {
-            text-decoration: underline;
-        }
-
-        .empty-message {
-            padding: 30px;
-            text-align: center;
-            color: #777;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #1f4e79;
-            text-decoration: none;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="header">
-        <h1>Hospital EMR</h1>
-        <p>Electronic Medical Record System</p>
     </div>
 
-    <div class="container">
 
-        <div class="top-bar">
-            <h2>Patients</h2>
+    <div style="
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        overflow: hidden;
+    ">
 
-            {% if can_create_patients %}
-                <a href="/patients/new/" class="add-button">
-                    + Register Patient
-                </a>
-            {% endif %}
-        </div>
+        {% if patients %}
 
-        <div class="table-container">
+            <table style="
+                width: 100%;
+                border-collapse: collapse;
+            ">
 
-            {% if patients %}
+                <thead>
 
-                <table>
-                    <thead>
-                        <tr>
-                            <th>MRN</th>
-                            <th>Patient Name</th>
-                            <th>Date of Birth</th>
-                            <th>Phone</th>
-                        </tr>
-                    </thead>
+                    <tr style="
+                        background-color: #e9eef3;
+                        text-align: left;
+                    ">
 
-                    <tbody>
+                        <th style="padding: 14px;">
+                            MRN
+                        </th>
 
-                        {% for patient in patients %}
+                        <th style="padding: 14px;">
+                            Patient Name
+                        </th>
 
-                            <tr>
+                        <th style="padding: 14px;">
+                            Date of Birth
+                        </th>
 
-                                <td>
-                                    {{ patient.medical_record_number }}
-                                </td>
+                        <th style="padding: 14px;">
+                            Phone
+                        </th>
 
-                                <td>
-                                    <a
-                                        href="/patients/{{ patient.id }}/"
-                                        class="patient-link"
-                                    >
-                                        {{ patient.first_name }}
+                    </tr>
 
-                                        {% if patient.middle_name %}
-                                            {{ patient.middle_name }}
-                                        {% endif %}
+                </thead>
 
-                                        {{ patient.last_name }}
-                                    </a>
-                                </td>
 
-                                <td>
-                                    {{ patient.date_of_birth }}
-                                </td>
+                <tbody>
 
-                                <td>
+                    {% for patient in patients %}
+
+                        <tr style="
+                            border-top: 1px solid #eee;
+                        ">
+
+                            <td style="padding: 14px;">
+                                {{ patient.medical_record_number }}
+                            </td>
+
+
+                            <td style="padding: 14px;">
+
+                                <a
+                                    href="/patients/{{ patient.id }}/"
+                                    style="
+                                        color: #1f4e79;
+                                        text-decoration: none;
+                                        font-weight: bold;
+                                    "
+                                >
+
+                                    {{ patient.first_name }}
+
+                                    {% if patient.middle_name %}
+                                        {{ patient.middle_name }}
+                                    {% endif %}
+
+                                    {{ patient.last_name }}
+
+                                </a>
+
+                            </td>
+
+
+                            <td style="padding: 14px;">
+                                {{ patient.date_of_birth }}
+                            </td>
+
+
+                            <td style="padding: 14px;">
+
+                                {% if patient.phone %}
                                     {{ patient.phone }}
-                                </td>
+                                {% else %}
+                                    —
+                                {% endif %}
 
-                            </tr>
+                            </td>
 
-                        {% endfor %}
+                        </tr>
 
-                    </tbody>
-                </table>
+                    {% endfor %}
 
-            {% else %}
+                </tbody>
 
-                <div class="empty-message">
+            </table>
+
+
+        {% else %}
+
+            <div style="
+                padding: 40px;
+                text-align: center;
+                color: #777;
+            ">
+
+                <p style="margin: 0 0 15px;">
                     No patients have been registered yet.
-                </div>
+                </p>
 
-            {% endif %}
+                {% if can_create_patients %}
 
-        </div>
+                    <a
+                        href="/patients/new/"
+                        style="
+                            color: #1f4e79;
+                            font-weight: bold;
+                            text-decoration: none;
+                        "
+                    >
+                        Register the first patient →
+                    </a>
 
-        <a href="/dashboard/" class="back-link">
-            ← Back to Dashboard
-        </a>
+                {% endif %}
+
+            </div>
+
+        {% endif %}
 
     </div>
 
-</body>
-</html>
+</div>
+
+{% endblock %}

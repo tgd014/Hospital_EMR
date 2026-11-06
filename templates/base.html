@@ -24,6 +24,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .hospital-name {
@@ -32,17 +34,33 @@
         }
 
         .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
             font-size: 14px;
         }
 
         .user-area a {
             color: white;
             text-decoration: none;
-            margin-left: 15px;
         }
 
         .user-area a:hover {
             text-decoration: underline;
+        }
+
+        .logout-button {
+            background: #ffffff;
+            color: #1f4e79;
+            border: none;
+            border-radius: 5px;
+            padding: 9px 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: #e8eef4;
         }
 
         .nav {
@@ -50,6 +68,7 @@
             padding: 0 40px;
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .nav a {
@@ -68,58 +87,67 @@
             margin: 30px auto;
             padding: 0 20px;
         }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .nav {
+                padding: 0 10px;
+            }
+
+            .nav a {
+                padding: 12px;
+            }
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-
     <div class="header">
-
         <div class="header-top">
-
-            <div>
-                <div class="hospital-name">
-                    Hospital EMR
-                </div>
+            <div class="hospital-name">
+                Hospital EMR
             </div>
 
             <div class="user-area">
+                <span>
+                    Logged in as:
+                    <strong>{{ request.user.username }}</strong>
+                </span>
 
-                Logged in as:
-                <strong>{{ request.user.username }}</strong>
-
-                <a href="/accounts/logout/">
-                    Logout
-                </a>
-
+                <form method="post" action="/accounts/logout/" style="margin:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="logout-button">
+                        Logout
+                    </button>
+                </form>
             </div>
-
         </div>
-
     </div>
 
-
     <nav class="nav">
+        <a href="{% url 'dashboard' %}">Dashboard</a>
 
-        <a href="/dashboard/">
-            Dashboard
-        </a>
+        {% if request.user.is_authenticated %}
+            {% if request.user.hospital_role.role.can_view_patients %}
+                <a href="{% url 'patient_list' %}">Patients</a>
+            {% endif %}
 
-        <a href="/patients/">
-            Patients
-        </a>
+            {% if request.user.hospital_role.role.can_create_patients %}
+                <a href="{% url 'patient_create' %}">Register Patient</a>
+            {% endif %}
 
-        <a href="/patients/new/">
-            Register Patient
-        </a>
-
+            {% if request.user.hospital_role.role.can_view_lab_worklist %}
+                <a href="/lab/worklist/">Lab Worklist</a>
+            {% endif %}
+        {% endif %}
     </nav>
-
 
     {% block content %}
     {% endblock %}
-
 </body>
 </html>

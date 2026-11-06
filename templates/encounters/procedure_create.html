@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .procedure-page {
+        min-height: calc(100vh - 40px);
+        padding: clamp(18px, 3vw, 36px);
+        background: #f3f6f5;
+        color: #263746;
+        font: 14px/1.5 Arial, sans-serif;
+    }
+
+    .procedure-shell { width: 100%; max-width: 860px; margin: 0 auto; }
+    .procedure-back { display: inline-block; margin-bottom: 16px; color: #315f50; font-weight: 600; text-decoration: none; }
+    .procedure-back:hover, .procedure-back:focus { text-decoration: underline; }
+    .procedure-heading { margin-bottom: 18px; }
+    .procedure-heading h1 { margin: 0 0 6px; color: #253746; font-size: 24px; font-weight: 600; }
+    .procedure-heading p { margin: 0; color: #64748b; line-height: 1.6; }
+    .procedure-card { padding: clamp(18px, 3vw, 28px); border: 1px solid #d5dfda; border-radius: 8px; background: #fff; box-shadow: 0 2px 8px rgba(22, 43, 34, .05); }
+    .procedure-card h2 { margin: 0 0 18px; color: #2d4654; font-size: 16px; font-weight: 600; }
+    .procedure-error { margin: 0 0 18px; padding: 11px 13px; border: 1px solid #e8b8b8; border-radius: 5px; background: #fff6f6; color: #8a2525; }
+    .procedure-field { margin-bottom: 18px; }
+    .procedure-field label { display: block; margin-bottom: 6px; color: #334155; font-size: 13px; font-weight: 600; }
+    .procedure-field input, .procedure-field select, .procedure-field textarea {
+        display: block; width: 100%; min-height: 40px; padding: 9px 11px;
+        border: 1px solid #b9c8c0; border-radius: 5px; background: #fff;
+        color: #263746; font: inherit;
+    }
+    .procedure-field textarea { min-height: 120px; resize: vertical; }
+    .procedure-field input:focus, .procedure-field select:focus, .procedure-field textarea:focus {
+        outline: 3px solid rgba(49, 95, 80, .18); border-color: #315f50;
+    }
+    .procedure-help { margin: 6px 0 0; color: #64748b; font-size: 12px; }
+    .catalog-results { display: grid; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
+    .catalog-result { width: 100%; padding: 10px 12px; border: 1px solid #dce7df; border-radius: 5px; background: #f8faf9; color: #263746; text-align: left; cursor: pointer; }
+    .catalog-result:hover, .catalog-result:focus { border-color: #6c9584; background: #edf4f0; }
+    .catalog-result-code { display: block; margin-bottom: 3px; color: #315f50; font-size: 12px; font-weight: 700; }
+    .catalog-result-title { display: block; font-size: 13px; }
+    .catalog-state { margin: 8px 0 0; color: #64748b; font-size: 12px; }
+    .catalog-selection { margin: 9px 0 0; padding: 10px 12px; border-left: 3px solid #397461; border-radius: 4px; background: #eff5f1; color: #263746; }
+    .procedure-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; color: #64748b; font-size: 12px; }
+    .procedure-divider::before, .procedure-divider::after { height: 1px; flex: 1; background: #e1e8e4; content: ""; }
+    .procedure-actions { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
+    .procedure-submit { min-height: 40px; padding: 9px 16px; border: 0; border-radius: 5px; background: #315f50; color: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+    .procedure-submit:hover, .procedure-submit:focus { background: #244f43; }
+    .procedure-cancel { color: #3c5665; font-weight: 600; text-decoration: none; }
+    .procedure-cancel:hover, .procedure-cancel:focus { text-decoration: underline; }
+    @media (max-width: 560px) {
+        .procedure-page { padding: 14px; }
+        .procedure-actions { align-items: stretch; flex-direction: column; }
+        .procedure-cancel { padding: 8px 0; text-align: center; }
+    }
+</style>
+
+<div class="procedure-page">
+    <main class="procedure-shell">
+        <a class="procedure-back" href="{% url 'encounter_detail' encounter.id %}">&larr; Back to encounter</a>
+
+        <header class="procedure-heading">
+            <h1>Record a procedure</h1>
+            <p>
+                {{ patient.first_name }} {{ patient.last_name }}
+                {% if patient.medical_record_number %}
+                    &middot; MRN {{ patient.medical_record_number }}
+                {% endif %}
+            </p>
+        </header>
+
+        <section class="procedure-card" aria-labelledby="procedure-form-title">
+            <h2 id="procedure-form-title">Procedure details</h2>
+
+            {% if error %}
+                <p class="procedure-error" role="alert">{{ error }}</p>
+            {% endif %}
+
+            <form method="post" data-search-url="{% url 'procedure_catalog_search' %}">
+                {% csrf_token %}
+
+                <div class="procedure-field">
+                    <label for="catalog-search">Search the ICD-10-PCS catalog</label>
+                    <input id="catalog-search" type="search" autocomplete="off" aria-controls="catalog-results" placeholder="Search by procedure name or code">
+                    <input id="catalog-procedure-code" name="catalog_procedure_code" type="hidden">
+                    <p class="procedure-help">Type at least two characters. Select a result to attach its code to the encounter.</p>
+                    <p id="catalog-state" class="catalog-state" aria-live="polite"></p>
+                    <ul id="catalog-results" class="catalog-results" role="listbox"></ul>
+                    <p id="catalog-selection" class="catalog-selection" aria-live="polite" hidden></p>
+                </div>
+
+                <div class="procedure-divider" aria-hidden="true">OR ENTER A PROCEDURE NAME</div>
+
+                <div class="procedure-field">
+                    <label for="custom_name">Procedure name</label>
+                    <input id="custom_name" name="custom_name" type="text" maxlength="250" autocomplete="off" value="{{ custom_name|default:'' }}">
+                    <p class="procedure-help">Use this when the procedure is not in the catalog. Custom entries are saved without a catalog code.</p>
+                </div>
+
+                <div class="procedure-field">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" required>
+                        {% for value, label in statuses %}
+                            <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="procedure-field">
+                    <label for="notes">Notes <span style="font-weight:normal;color:#64748b;">(optional)</span></label>
+                    <textarea id="notes" name="notes" rows="4"></textarea>
+                </div>
+
+                <div class="procedure-actions">
+                    <button class="procedure-submit" type="submit">Save procedure</button>
+                    <a class="procedure-cancel" href="{% url 'encounter_detail' encounter.id %}">Cancel</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+
+<script>
+    (function () {
+        const form = document.querySelector(".procedure-card form");
+        const searchInput = document.getElementById("catalog-search");
+        const codeInput = document.getElementById("catalog-procedure-code");
+        const customNameInput = document.getElementById("custom_name");
+        const resultsList = document.getElementById("catalog-results");
+        const statusMessage = document.getElementById("catalog-state");
+        const selectionMessage = document.getElementById("catalog-selection");
+        let searchTimer;
+
+        function clearResults() {
+            resultsList.replaceChildren();
+        }
+
+        function clearSelection() {
+            codeInput.value = "";
+            selectionMessage.hidden = true;
+            selectionMessage.textContent = "";
+        }
+
+        function chooseResult(item) {
+            codeInput.value = item.code;
+            customNameInput.value = "";
+            selectionMessage.textContent = "Selected " + item.code + " — " + item.full_title;
+            selectionMessage.hidden = false;
+            searchInput.value = "";
+            clearResults();
+            statusMessage.textContent = "";
+        }
+
+        function renderResults(items) {
+            clearResults();
+            if (!items.length) {
+                statusMessage.textContent = "No matching catalog procedures. You can enter a custom procedure name below.";
+                return;
+            }
+
+            statusMessage.textContent = items.length + " matching procedures";
+            items.forEach(function (item) {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "catalog-result";
+                button.setAttribute("role", "option");
+
+                const code = document.createElement("span");
+                code.className = "catalog-result-code";
+                code.textContent = item.code;
+
+                const title = document.createElement("span");
+                title.className = "catalog-result-title";
+                title.textContent = item.full_title;
+
+                button.append(code, title);
+                button.addEventListener("click", function () {
+                    chooseResult(item);
+                });
+
+                const row = document.createElement("li");
+                row.appendChild(button);
+                resultsList.appendChild(row);
+            });
+        }
+
+        searchInput.addEventListener("input", function () {
+            window.clearTimeout(searchTimer);
+            clearSelection();
+            const query = searchInput.value.trim();
+            clearResults();
+
+            if (query.length < 2) {
+                statusMessage.textContent = "Type at least two characters to search.";
+                return;
+            }
+
+            statusMessage.textContent = "Searching…";
+            searchTimer = window.setTimeout(function () {
+                const url = new URL(form.dataset.searchUrl, window.location.origin);
+                url.searchParams.set("q", query);
+
+                fetch(url, { credentials: "same-origin", headers: { "Accept": "application/json" } })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("Catalog search is unavailable.");
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        renderResults(data.results || []);
+                    })
+                    .catch(function () {
+                        statusMessage.textContent = "Catalog search is unavailable. You can enter a custom procedure name below.";
+                    });
+            }, 250);
+        });
+
+        customNameInput.addEventListener("input", function () {
+            if (customNameInput.value.trim()) {
+                clearSelection();
+                searchInput.value = "";
+                clearResults();
+                statusMessage.textContent = "";
+            }
+        });
+
+        form.addEventListener("submit", function (event) {
+            if (!codeInput.value && !customNameInput.value.trim()) {
+                event.preventDefault();
+                statusMessage.textContent = "Select a catalog procedure or enter a procedure name.";
+                searchInput.focus();
+            }
+            if (codeInput.value && customNameInput.value.trim()) {
+                event.preventDefault();
+                statusMessage.textContent = "Use either a catalog selection or a custom name, not both.";
+                customNameInput.focus();
+            }
+        });
+
+        statusMessage.textContent = "Type at least two characters to search.";
+    })();
+</script>
+{% endblock %}

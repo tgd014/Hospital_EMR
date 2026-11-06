@@ -1,161 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>New Encounter - Hospital EMR</title>
+{% block title %}
+Clinical Encounter - Hospital EMR
+{% endblock %}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            color: #333;
-        }
+{% block content %}
 
-        .header {
-            background-color: #1f4e79;
-            color: white;
-            padding: 20px 40px;
-        }
+<div class="container">
 
-        .header h1 {
-            margin: 0;
-            font-size: 26px;
-        }
+    <!-- Back -->
 
-        .header p {
-            margin: 5px 0 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .back-link {
+    <a
+        href="/patients/{{ patient.id }}/"
+        style="
             color: #1f4e79;
             text-decoration: none;
             font-weight: bold;
-        }
+        "
+    >
+        ← Back to Patient Chart
+    </a>
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
 
-        .card {
-            background-color: white;
-            margin-top: 20px;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
+    <!-- Patient Header -->
 
-        .card h2 {
-            margin-top: 0;
-            color: #1f4e79;
-        }
+    <div style="
+        background: white;
+        margin-top: 20px;
+        padding: 22px 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
 
-        .patient-name {
-            background-color: #f8fafc;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 25px;
-        }
-
-        .patient-name strong {
-            font-size: 18px;
-        }
-
-        .field {
-            margin-bottom: 20px;
-        }
-
-        .field label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 7px;
-        }
-
-        .field select {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 15px;
-            background-color: white;
-        }
-
-        .info-box {
-            background-color: #eef5fb;
-            border-left: 4px solid #1f4e79;
-            padding: 15px;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        .buttons {
+        <div style="
             display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        ">
 
-        .start-button {
-            background-color: #198754;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+            <div>
 
-        .start-button:hover {
-            background-color: #157347;
-        }
+                <h2 style="
+                    margin: 0 0 6px;
+                    color: #1f4e79;
+                ">
 
-        .cancel-button {
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 15px;
-        }
-
-        .cancel-button:hover {
-            background-color: #5c636a;
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="header">
-        <h1>Hospital EMR</h1>
-        <p>Electronic Medical Record System</p>
-    </div>
-
-    <div class="container">
-
-        <a
-            href="/patients/{{ patient.id }}/"
-            class="back-link"
-        >
-            ← Back to Patient Chart
-        </a>
-
-        <div class="card">
-
-            <h2>Start New Encounter</h2>
-
-            <div class="patient-name">
-                <strong>
                     {{ patient.first_name }}
 
                     {% if patient.middle_name %}
@@ -163,65 +53,516 @@
                     {% endif %}
 
                     {{ patient.last_name }}
-                </strong>
 
-                <br>
+                </h2>
 
-                <span>
-                    MRN: {{ patient.medical_record_number }}
-                </span>
-            </div>
+                <div style="
+                    color: #666;
+                    font-size: 14px;
+                ">
 
-            <div class="info-box">
-                You are starting a new outpatient encounter for this patient.
-                The encounter will be created with an <strong>Open</strong>
-                status.
-            </div>
+                    MRN:
+                    <strong>
+                        {{ patient.medical_record_number }}
+                    </strong>
 
-            <form method="post">
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
 
-                {% csrf_token %}
-
-                <div class="field">
-
-                    <label for="encounter_type">
-                        Encounter Type
-                    </label>
-
-                    <select
-                        id="encounter_type"
-                        name="encounter_type"
-                    >
-                        <option value="outpatient">
-                            Outpatient
-                        </option>
-                    </select>
+                    DOB:
+                    <strong>
+                        {{ patient.date_of_birth }}
+                    </strong>
 
                 </div>
 
-                <div class="buttons">
+            </div>
 
-                    <button
-                        type="submit"
-                        class="start-button"
-                    >
-                        Start Encounter
-                    </button>
 
-                    <a
-                        href="/patients/{{ patient.id }}/"
-                        class="cancel-button"
-                    >
-                        Cancel
-                    </a>
-
-                </div>
-
-            </form>
+            <div style="
+                background-color: #fff3cd;
+                color: #856404;
+                padding: 8px 14px;
+                border-radius: 5px;
+                font-size: 13px;
+                font-weight: bold;
+            ">
+                OPEN ENCOUNTER
+            </div>
 
         </div>
 
     </div>
 
-</body>
-</html>
+
+    <!-- Encounter Information -->
+
+    <div style="
+        background: white;
+        margin-top: 20px;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+
+        <h3 style="
+            margin-top: 0;
+            color: #1f4e79;
+        ">
+            Encounter Information
+        </h3>
+
+
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        ">
+
+            <div style="
+                background-color: #f8fafc;
+                padding: 14px;
+                border-radius: 6px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 5px;
+                ">
+                    Encounter Type
+                </div>
+
+                <strong>
+                    Outpatient
+                </strong>
+
+            </div>
+
+
+            <div style="
+                background-color: #f8fafc;
+                padding: 14px;
+                border-radius: 6px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 5px;
+                ">
+                    Started
+                </div>
+
+                <strong>
+                    New Encounter
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Clinical Documentation -->
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        <div style="
+            background: white;
+            margin-top: 20px;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        ">
+
+            <h3 style="
+                margin-top: 0;
+                color: #1f4e79;
+            ">
+                Clinical Documentation
+            </h3>
+
+
+            <p style="
+                color: #777;
+                font-size: 14px;
+                margin-bottom: 25px;
+            ">
+                Document the patient's current clinical presentation,
+                assessment, and treatment plan.
+            </p>
+
+
+            <!-- Chief Complaint -->
+
+            <div style="margin-bottom: 22px;">
+
+                <label
+                    for="chief_complaint"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Chief Complaint
+                </label>
+
+                <textarea
+                    id="chief_complaint"
+                    name="chief_complaint"
+                    rows="3"
+                    placeholder="Why is the patient seeking care today?"
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- History -->
+
+            <div style="margin-bottom: 22px;">
+
+                <label
+                    for="history_of_present_illness"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    History of Present Illness
+                </label>
+
+                <textarea
+                    id="history_of_present_illness"
+                    name="history_of_present_illness"
+                    rows="5"
+                    placeholder="Describe the history and progression of the present illness."
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- Medical / Surgical History -->
+
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            ">
+
+
+                <div style="margin-bottom: 22px;">
+
+                    <label
+                        for="past_medical_history"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Past Medical History
+                    </label>
+
+                    <textarea
+                        id="past_medical_history"
+                        name="past_medical_history"
+                        rows="5"
+                        placeholder="Relevant previous medical conditions."
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                            resize: vertical;
+                        "
+                    ></textarea>
+
+                </div>
+
+
+                <div style="margin-bottom: 22px;">
+
+                    <label
+                        for="past_surgical_history"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Past Surgical History
+                    </label>
+
+                    <textarea
+                        id="past_surgical_history"
+                        name="past_surgical_history"
+                        rows="5"
+                        placeholder="Previous surgeries or procedures."
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                            resize: vertical;
+                        "
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- Allergies / Medications -->
+
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            ">
+
+
+                <div style="margin-bottom: 22px;">
+
+                    <label
+                        for="allergies"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Allergies
+                    </label>
+
+                    <textarea
+                        id="allergies"
+                        name="allergies"
+                        rows="4"
+                        placeholder="Drug, food, or other allergies. Enter 'No known allergies' if appropriate."
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                            resize: vertical;
+                        "
+                    ></textarea>
+
+                </div>
+
+
+                <div style="margin-bottom: 22px;">
+
+                    <label
+                        for="current_medications"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Current Medications
+                    </label>
+
+                    <textarea
+                        id="current_medications"
+                        name="current_medications"
+                        rows="4"
+                        placeholder="Medications the patient is currently taking."
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                            resize: vertical;
+                        "
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- Examination -->
+
+            <div style="margin-bottom: 22px;">
+
+                <label
+                    for="clinical_examination"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Clinical Examination
+                </label>
+
+                <textarea
+                    id="clinical_examination"
+                    name="clinical_examination"
+                    rows="6"
+                    placeholder="Record relevant examination findings."
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- Assessment -->
+
+            <div style="margin-bottom: 22px;">
+
+                <label
+                    for="assessment"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Assessment / Diagnosis
+                </label>
+
+                <textarea
+                    id="assessment"
+                    name="assessment"
+                    rows="5"
+                    placeholder="Clinical assessment and working diagnosis."
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- Treatment Plan -->
+
+            <div style="margin-bottom: 25px;">
+
+                <label
+                    for="treatment_plan"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Treatment Plan
+                </label>
+
+                <textarea
+                    id="treatment_plan"
+                    name="treatment_plan"
+                    rows="5"
+                    placeholder="Treatment, investigations, follow-up, and other plans."
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- Actions -->
+
+            <div style="
+                display: flex;
+                gap: 10px;
+                border-top: 1px solid #eee;
+                padding-top: 20px;
+            ">
+
+                <button
+                    type="submit"
+                    style="
+                        background-color: #198754;
+                        color: white;
+                        border: none;
+                        padding: 12px 20px;
+                        border-radius: 6px;
+                        font-size: 15px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    "
+                >
+                    Save Clinical Encounter
+                </button>
+
+
+                <a
+                    href="/patients/{{ patient.id }}/"
+                    style="
+                        background-color: #6c757d;
+                        color: white;
+                        text-decoration: none;
+                        padding: 12px 20px;
+                        border-radius: 6px;
+                        font-size: 15px;
+                    "
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

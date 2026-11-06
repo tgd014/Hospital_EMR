@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-mj21$yl^2pfic0fvjw#0*j4q@rv9u!1!iyev3f@+vzfr&@-v&y
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['cussed-confused-crib.ngrok-free.dev', '127.0.0.1', 'localhost']
+CSRF_TRUSTED_ORIGINS = ['https://cussed-confused-crib.ngrok-free.dev']
 
 
 # Application definition

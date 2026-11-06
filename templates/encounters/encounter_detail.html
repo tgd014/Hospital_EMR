@@ -1,0 +1,1172 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+#encounter-workspace{width:100%;max-width:none;margin:0;padding:16px clamp(14px,2vw,28px) 30px;background:#f3f6f5;color:#263746;font:14px/1.45 Arial,sans-serif}
+#encounter-workspace,#encounter-workspace *{box-sizing:border-box}
+.encounter-header{margin:0 0 12px!important;padding:0 0 14px;border-bottom:1px solid #d7e0dc}
+.encounter-header>a{color:#315d50!important;font-size:13px;font-weight:600}
+.encounter-header h1{margin:10px 0 5px!important;color:#253746;font-size:23px;font-weight:600}
+.encounter-header p{font-size:13px}.encounter-header strong{color:#253746}
+.encounter-nav{display:flex;gap:4px;margin:0 0 16px;padding:0 0 8px;overflow-x:auto;border-bottom:1px solid #cbd7d1;white-space:nowrap}
+.encounter-nav a{padding:8px 12px;border-radius:5px 5px 0 0;color:#3c5665;font-size:13px;font-weight:600;text-decoration:none}
+.encounter-nav a:hover,.encounter-nav a:focus{background:#e4ece8;color:#244f43}
+.encounter-columns{display:grid;grid-template-columns:minmax(220px,250px) minmax(0,1fr);gap:16px;align-items:start}
+.encounter-sidebar{min-width:0}
+.encounter-main{min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+#encounter-summary,#encounter-vitals,#encounter-medications,#encounter-procedures,#encounter-tests,#encounter-documentation{min-width:0;margin:0!important;padding:16px!important;border:1px solid #d5dfda!important;border-radius:6px;background:#fff!important;box-shadow:0 1px 2px rgba(22,43,34,.05);scroll-margin-top:16px}
+#encounter-summary{position:sticky;top:14px}
+#encounter-vitals,#encounter-tests,#encounter-documentation{grid-column:1/-1}
+#encounter-workspace h2{margin:0 0 12px;color:#2d4654;font-size:16px;font-weight:600}
+#encounter-workspace h3{color:#2d4654!important;font-size:14px;font-weight:600}
+#encounter-summary p{margin:9px 0;font-size:13px}
+#encounter-summary a[href]{background:#315f50!important;font-size:13px}
+#encounter-workspace a[href*="create"]{background:#315f50!important;font-size:13px}
+#encounter-vitals div[style*="border:1px solid #e2e8f0"],#encounter-medications div[style*="border:1px solid #e2e8f0"],#encounter-procedures div[style*="border:1px solid #e2e8f0"],#encounter-tests div[style*="border:1px solid #e2e8f0"]{border-color:#e1e8e4!important;border-radius:5px!important;background:#f8faf9!important}
+#encounter-vitals div[style*="display:grid"]{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}
+#encounter-vitals strong{font-size:16px!important}
+#encounter-documentation form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+#encounter-documentation form>div,#encounter-documentation form>button{min-width:0}
+#encounter-documentation form>button{grid-column:1/-1;justify-self:start;background:#315f50!important}
+#encounter-documentation textarea{font:14px/1.45 Arial,sans-serif;resize:vertical}
+@media(max-width:1050px){.encounter-columns{grid-template-columns:210px minmax(0,1fr);gap:12px}.encounter-main{gap:12px}#encounter-vitals div[style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:720px){#encounter-workspace{padding:12px}.encounter-columns{grid-template-columns:1fr}#encounter-summary{position:static}.encounter-main{grid-template-columns:1fr}#encounter-vitals,#encounter-tests,#encounter-documentation{grid-column:1}#encounter-documentation form{grid-template-columns:1fr}#encounter-documentation form>button{grid-column:1}}
+</style>
+
+<div id="encounter-workspace">
+
+    <!-- Page Header -->
+
+    <div class="encounter-header">
+
+        <a
+            href="{% url 'patient_detail' patient.id %}"
+            style="
+                color:#1f4e79;
+                text-decoration:none;
+            "
+        >
+            &larr; Back to Patient Chart
+        </a>
+
+        <h1 style="
+            margin-bottom:8px;
+            margin-top:16px;
+        ">
+            Clinical Encounter
+        </h1>
+
+        <p style="
+            color:#64748b;
+            margin:0;
+        ">
+
+            Patient:
+
+            <strong>
+                {{ patient.first_name }} {{ patient.last_name }}
+            </strong>
+
+            {% if patient.medical_record_number %}
+                | MRN: {{ patient.medical_record_number }}
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+<nav class="encounter-nav" aria-label="Encounter sections">
+<a href="#encounter-summary">Encounter</a>
+<a href="#encounter-vitals">Vitals</a>
+<a href="#encounter-medications">Medications</a>
+<a href="#encounter-procedures">Procedures</a>
+<a href="#encounter-tests">Test Orders</a>
+<a href="#encounter-documentation">Documentation</a>
+</nav>
+<div class="encounter-columns">
+<aside class="encounter-sidebar">
+    <!-- Encounter Information -->
+
+    <div id="encounter-summary" style="
+        background:#ffffff;
+        border:1px solid #e2e8f0;
+        border-radius:12px;
+        padding:24px;
+        margin-bottom:24px;
+    ">
+
+        <h2 style="margin-top:0;">
+            Encounter Information
+        </h2>
+
+        <p>
+            <strong>Encounter ID:</strong>
+            {{ encounter.id }}
+        </p>
+
+        <p>
+            <strong>Type:</strong>
+            {{ encounter.get_encounter_type_display }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {{ encounter.get_status_display }}
+        </p>
+
+        <p>
+            <strong>Started:</strong>
+            {{ encounter.started_at|date:"M d, Y H:i" }}
+        </p>
+
+        {% if encounter.ended_at %}
+
+            <p>
+                <strong>Ended:</strong>
+                {{ encounter.ended_at|date:"M d, Y H:i" }}
+            </p>
+
+        {% endif %}
+
+        <a
+            href="{% url 'vitals_create' encounter.id %}"
+            style="
+                display:inline-block;
+                margin-top:12px;
+                background:#16805d;
+                color:white;
+                text-decoration:none;
+                padding:12px 18px;
+                border-radius:7px;
+                font-weight:bold;
+            "
+        >
+            Record / View Vital Signs
+        </a>
+
+    </div>
+
+
+    </aside>
+    <main class="encounter-main">
+    <!-- Vital Signs -->
+
+    <div id="encounter-vitals" style="
+        background:#ffffff;
+        border:1px solid #e2e8f0;
+        border-radius:12px;
+        padding:24px;
+        margin-bottom:24px;
+    ">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+        ">
+
+            <h2 style="margin:0;">
+                Vital Signs
+            </h2>
+
+            <a
+                href="{% url 'vitals_create' encounter.id %}"
+                style="
+                    background:#16805d;
+                    color:white;
+                    text-decoration:none;
+                    padding:9px 14px;
+                    border-radius:7px;
+                    font-weight:bold;
+                    font-size:14px;
+                "
+            >
+                + Record Vitals
+            </a>
+
+        </div>
+
+
+        {% if vital_signs %}
+
+            {% for vital in vital_signs %}
+
+                <div style="
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    padding:18px;
+                    margin-bottom:14px;
+                    background:#f8fafc;
+                ">
+
+                    <div style="
+                        display:grid;
+                        grid-template-columns:repeat(4, 1fr);
+                        gap:15px;
+                    ">
+
+                        <!-- Blood Pressure -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                Blood Pressure
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.systolic_bp and vital.diastolic_bp %}
+
+                                    {{ vital.systolic_bp }}/{{ vital.diastolic_bp }}
+
+                                    <span style="
+                                        font-size:12px;
+                                        font-weight:normal;
+                                    ">
+                                        mmHg
+                                    </span>
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Pulse -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                Pulse
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.pulse %}
+
+                                    {{ vital.pulse }}
+
+                                    <span style="
+                                        font-size:12px;
+                                        font-weight:normal;
+                                    ">
+                                        bpm
+                                    </span>
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Respiratory Rate -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                Respiratory Rate
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.respiratory_rate %}
+
+                                    {{ vital.respiratory_rate }}
+
+                                    <span style="
+                                        font-size:12px;
+                                        font-weight:normal;
+                                    ">
+                                        /min
+                                    </span>
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Temperature -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                Temperature
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.temperature %}
+
+                                    {{ vital.temperature }} °C
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- SpO2 -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                SpO₂
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.spo2 %}
+
+                                    {{ vital.spo2 }}%
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Weight -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                Weight
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.weight_kg %}
+
+                                    {{ vital.weight_kg }} kg
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- Height -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                Height
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.height_cm %}
+
+                                    {{ vital.height_cm }} cm
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+
+                        <!-- BMI -->
+
+                        <div>
+
+                            <div style="
+                                font-size:12px;
+                                color:#64748b;
+                                margin-bottom:4px;
+                            ">
+                                BMI
+                            </div>
+
+                            <strong style="font-size:18px;">
+
+                                {% if vital.bmi %}
+
+                                    {{ vital.bmi }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Recorded Information -->
+
+                    <div style="
+                        margin-top:15px;
+                        padding-top:12px;
+                        border-top:1px solid #e2e8f0;
+                        color:#64748b;
+                        font-size:13px;
+                    ">
+
+                        Recorded:
+                        {{ vital.recorded_at|date:"M d, Y H:i" }}
+
+                        {% if vital.recorded_by %}
+
+                            by
+                            {{ vital.recorded_by.get_full_name|default:vital.recorded_by.username }}
+
+                        {% endif %}
+
+                    </div>
+
+
+                    {% if vital.notes %}
+
+                        <div style="
+                            margin-top:10px;
+                            font-size:14px;
+                        ">
+
+                            <strong>
+                                Notes:
+                            </strong>
+
+                            {{ vital.notes }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+
+        {% else %}
+
+            <div style="
+                padding:20px;
+                background:#f8fafc;
+                border-radius:8px;
+                color:#64748b;
+            ">
+                No vital signs have been recorded for this encounter yet.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Medication Prescriptions -->
+
+    <div id="encounter-medications" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 style="margin:0;">Medication Prescriptions</h2>
+            {% if encounter.status == "open" and can_prescribe_medications %}
+                <a href="{% url 'medication_prescription_create' encounter.id %}" style="background:#1f4e79;color:white;text-decoration:none;padding:9px 14px;border-radius:7px;font-weight:bold;font-size:14px;">+ Prescribe Medication</a>
+            {% endif %}
+        </div>
+        {% if prescriptions %}
+            {% for prescription in prescriptions %}
+                <div style="border:1px solid #e2e8f0;border-radius:8px;padding:18px;margin-bottom:14px;background:#f8fafc;">
+                    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                        <h3 style="margin:0;color:#1f4e79;">{{ prescription.medication_name }}{% if prescription.strength %} - {{ prescription.strength }}{% endif %}</h3>
+                        <strong>{{ prescription.get_status_display }}</strong>
+                    </div>
+                    <p><strong>Dosage:</strong> {{ prescription.dosage }} &nbsp; <strong>Route:</strong> {{ prescription.get_route_display }} &nbsp; <strong>Frequency:</strong> {{ prescription.frequency }}</p>
+                    <p><strong>Duration:</strong> {{ prescription.duration|default:"Not specified" }} &nbsp; <strong>Quantity:</strong> {{ prescription.quantity }}</p>
+                    {% if prescription.instructions %}<p style="white-space:pre-wrap;"><strong>Instructions:</strong> {{ prescription.instructions }}</p>{% endif %}
+                    <div style="color:#64748b;font-size:13px;">Prescribed {{ prescription.prescribed_at|date:"M d, Y H:i" }}{% if prescription.prescribed_by %} by {{ prescription.prescribed_by.get_full_name|default:prescription.prescribed_by.username }}{% endif %}</div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div style="padding:20px;background:#f8fafc;border-radius:8px;color:#64748b;">No medications have been prescribed for this encounter.</div>
+        {% endif %}
+        <p style="color:#64748b;font-size:13px;margin-bottom:0;">A prescription records the clinician's order; it does not indicate that medication has been dispensed.</p>
+    </div>
+
+<!-- Procedures -->
+
+<div id="encounter-procedures" style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2 style="margin:0;">Procedures</h2>
+
+        {% if encounter.status == "open" and can_record_procedures %}
+            <a
+                href="{% url 'procedure_create' encounter.id %}"
+                style="background:#1f4e79;color:white;text-decoration:none;padding:9px 14px;border-radius:7px;font-weight:bold;font-size:14px;"
+            >
+                + Record Procedure
+            </a>
+        {% endif %}
+    </div>
+
+    {% if procedures %}
+        {% for procedure in procedures %}
+            <div style="border:1px solid #e2e8f0;border-radius:8px;padding:18px;margin-bottom:14px;background:#f8fafc;">
+                <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                    <h3 style="margin:0;color:#1f4e79;">
+                        {{ procedure.display_name }}
+                    </h3>
+                        {% if procedure.catalog_procedure %}
+                            <span style="color:#64748b;font-size:12px;">
+                                ICD-10-PCS {{ procedure.catalog_procedure.code }}
+                            </span>
+                        {% endif %}
+                    <strong>{{ procedure.get_status_display }}</strong>
+                </div>
+
+                <p style="color:#64748b;font-size:13px;">
+                    Recorded {{ procedure.recorded_at|date:"M d, Y H:i" }}
+                    {% if procedure.recorded_by %}
+                        by {{ procedure.recorded_by.get_full_name|default:procedure.recorded_by.username }}
+                    {% endif %}
+                </p>
+
+                {% if procedure.notes %}
+                    <p style="white-space:pre-wrap;">{{ procedure.notes }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div style="padding:20px;background:#f8fafc;border-radius:8px;color:#64748b;">
+            No procedures have been recorded for this encounter.
+        </div>
+    {% endif %}
+</div>
+    <!-- Test Orders -->
+
+    <div id="encounter-tests" style="
+        background:#ffffff;
+        border:1px solid #e2e8f0;
+        border-radius:12px;
+        padding:24px;
+        margin-bottom:24px;
+    ">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:20px;
+        ">
+
+            <h2 style="margin:0;">
+                Test Orders
+            </h2>
+
+            {% if encounter.status == "open" %}
+
+                <a
+                    href="{% url 'test_order_create' encounter.id %}"
+                    style="
+                        background:#1f4e79;
+                        color:white;
+                        text-decoration:none;
+                        padding:9px 14px;
+                        border-radius:7px;
+                        font-weight:bold;
+                        font-size:14px;
+                    "
+                >
+                    + Order a Test
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+        {% if test_orders %}
+
+            {% for order in test_orders %}
+
+                <div style="
+                    border:1px solid #e2e8f0;
+                    border-radius:8px;
+                    padding:18px;
+                    margin-bottom:14px;
+                    background:#f8fafc;
+                ">
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:flex-start;
+                        gap:20px;
+                    ">
+
+                        <div>
+
+                            <h3 style="
+                                margin:0 0 8px;
+                                color:#1f4e79;
+                            ">
+                                {{ order.test_name }}
+                            </h3>
+
+                            <div style="
+                                color:#64748b;
+                                font-size:14px;
+                            ">
+
+                                {{ order.get_test_category_display }}
+
+                                &nbsp;•&nbsp;
+
+                                {{ order.get_priority_display }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div style="
+                            padding:6px 10px;
+                            background:#e0f2fe;
+                            color:#0369a1;
+                            border-radius:6px;
+                            font-size:13px;
+                            font-weight:bold;
+                            white-space:nowrap;
+                        ">
+                            {{ order.get_status_display }}
+                        </div>
+
+                    </div>
+
+
+                    {% if order.clinical_indication %}
+
+                        <div style="
+                            margin-top:14px;
+                            font-size:14px;
+                        ">
+
+                            <strong>
+                                Clinical Indication:
+                            </strong>
+
+                            <div style="
+                                margin-top:4px;
+                                white-space:pre-wrap;
+                            ">
+                                {{ order.clinical_indication }}
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    {% if order.notes %}
+
+                        <div style="
+                            margin-top:12px;
+                            font-size:14px;
+                        ">
+
+                            <strong>
+                                Notes:
+                            </strong>
+
+                            <div style="
+                                margin-top:4px;
+                                white-space:pre-wrap;
+                            ">
+                                {{ order.notes }}
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <div style="
+                        margin-top:14px;
+                        padding-top:12px;
+                        border-top:1px solid #e2e8f0;
+                        color:#64748b;
+                        font-size:13px;
+                    ">
+
+                        Ordered:
+                        {{ order.ordered_at|date:"M d, Y H:i" }}
+
+                        {% if order.ordered_by %}
+
+                            by
+                            {{ order.ordered_by.get_full_name|default:order.ordered_by.username }}
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+
+        {% else %}
+
+            <div style="
+                padding:20px;
+                background:#f8fafc;
+                border-radius:8px;
+                color:#64748b;
+            ">
+                No tests have been ordered for this encounter yet.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Clinical Documentation -->
+
+    {% if encounter.status == "open" %}
+
+        <div id="encounter-documentation" style="
+            background:#ffffff;
+            border:1px solid #e2e8f0;
+            border-radius:12px;
+            padding:24px;
+        ">
+
+            <h2 style="margin-top:0;">
+                Clinical Documentation
+            </h2>
+
+
+            <form method="post">
+
+                {% csrf_token %}
+
+
+                <!-- Chief Complaint -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="chief_complaint"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Chief Complaint
+                    </label>
+
+                    <textarea
+                        id="chief_complaint"
+                        name="chief_complaint"
+                        rows="3"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.chief_complaint }}</textarea>
+
+                </div>
+
+
+                <!-- History of Present Illness -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="history_of_present_illness"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        History of Present Illness
+                    </label>
+
+                    <textarea
+                        id="history_of_present_illness"
+                        name="history_of_present_illness"
+                        rows="4"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.history_of_present_illness }}</textarea>
+
+                </div>
+
+
+                <!-- Past Medical History -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="past_medical_history"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Past Medical History
+                    </label>
+
+                    <textarea
+                        id="past_medical_history"
+                        name="past_medical_history"
+                        rows="3"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.past_medical_history }}</textarea>
+
+                </div>
+
+
+                <!-- Past Surgical History -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="past_surgical_history"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Past Surgical History
+                    </label>
+
+                    <textarea
+                        id="past_surgical_history"
+                        name="past_surgical_history"
+                        rows="3"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.past_surgical_history }}</textarea>
+
+                </div>
+
+
+                <!-- Allergies -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="allergies"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Allergies
+                    </label>
+
+                    <textarea
+                        id="allergies"
+                        name="allergies"
+                        rows="2"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.allergies }}</textarea>
+
+                </div>
+
+
+                <!-- Current Medications -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="current_medications"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Current Medications
+                    </label>
+
+                    <textarea
+                        id="current_medications"
+                        name="current_medications"
+                        rows="3"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.current_medications }}</textarea>
+
+                </div>
+
+
+                <!-- Clinical Examination -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="clinical_examination"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Clinical Examination
+                    </label>
+
+                    <textarea
+                        id="clinical_examination"
+                        name="clinical_examination"
+                        rows="4"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.clinical_examination }}</textarea>
+
+                </div>
+
+
+                <!-- Assessment -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="assessment"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Assessment / Diagnosis
+                    </label>
+
+                    <textarea
+                        id="assessment"
+                        name="assessment"
+                        rows="3"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.assessment }}</textarea>
+
+                </div>
+
+
+                <!-- Treatment Plan -->
+
+                <div style="margin-bottom:20px;">
+
+                    <label
+                        for="treatment_plan"
+                        style="
+                            display:block;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                        "
+                    >
+                        Treatment Plan
+                    </label>
+
+                    <textarea
+                        id="treatment_plan"
+                        name="treatment_plan"
+                        rows="4"
+                        style="
+                            box-sizing:border-box;
+                            width:100%;
+                            padding:12px;
+                            border:1px solid #cbd5e1;
+                            border-radius:6px;
+                        "
+                    >{{ encounter.treatment_plan }}</textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    style="
+                        background:#1f4e79;
+                        color:white;
+                        border:none;
+                        padding:13px 22px;
+                        border-radius:7px;
+                        font-weight:bold;
+                        cursor:pointer;
+                    "
+                >
+                    Save Clinical Documentation
+                </button>
+
+            </form>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- Closed Encounter -->
+
+        <div id="encounter-documentation" style="
+            background:#ffffff;
+            border:1px solid #e2e8f0;
+            border-radius:12px;
+            padding:24px;
+        ">
+
+            <h2 style="margin-top:0;">
+                Clinical Documentation
+            </h2>
+
+
+            {% for label, value in clinical_sections %}
+
+                <div style="
+                    padding:14px 0;
+                    border-bottom:1px solid #e2e8f0;
+                ">
+
+                    <h3 style="
+                        margin:0 0 8px;
+                        font-size:16px;
+                    ">
+                        {{ label }}
+                    </h3>
+
+                    <p style="
+                        margin:0;
+                        white-space:pre-wrap;
+                    ">
+                        {{ value|default:"Not documented" }}
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+
+            <p style="
+                margin-top:20px;
+                color:#64748b;
+            ">
+                This encounter is not open, so clinical documentation cannot be edited.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+    </main>
+    </div>
+</div>
+
+{% endblock %}
+

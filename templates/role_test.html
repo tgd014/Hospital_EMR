@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}
+Role Permissions - Hospital EMR
+{% endblock %}
+
+{% block content %}
+
+<div style="max-width:1000px;margin:0 auto;padding:24px;">
+
+    <!-- Header -->
+
+    <div style="margin-bottom:24px;">
+
+        <a
+            href="{% url 'dashboard' %}"
+            style="color:#1f4e79;text-decoration:none;font-weight:bold;"
+        >
+            &larr; Back to Dashboard
+        </a>
+
+        <h1 style="margin:16px 0 8px;color:#1f4e79;">
+            Role Permissions
+        </h1>
+
+        <p style="margin:0;color:#64748b;">
+            Review the permissions assigned to your current hospital account.
+        </p>
+
+    </div>
+
+
+    <!-- Account Information -->
+
+    <div style="
+        background:white;
+        border:1px solid #e2e8f0;
+        border-radius:12px;
+        padding:24px;
+        margin-bottom:24px;
+    ">
+
+        <h2 style="margin-top:0;">
+            Account Information
+        </h2>
+
+        <p>
+            <strong>Username:</strong>
+            {{ request.user.username }}
+        </p>
+
+        <p>
+            <strong>Account Status:</strong>
+
+            {% if request.user.is_active %}
+                Active
+            {% else %}
+                Inactive
+            {% endif %}
+        </p>
+
+        <p>
+            <strong>Hospital Role:</strong>
+            {{ hospital_role|default:"No hospital role assigned" }}
+        </p>
+
+    </div>
+
+
+    <!-- Permission Table -->
+
+    <div style="
+        background:white;
+        border:1px solid #e2e8f0;
+        border-radius:12px;
+        padding:24px;
+    ">
+
+        <h2 style="margin-top:0;">
+            Permission Details
+        </h2>
+
+        <p style="color:#64748b;">
+            These permissions determine which actions your account can perform.
+        </p>
+
+        <div style="overflow-x:auto;">
+
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                margin-top:16px;
+            ">
+
+                <thead>
+
+                    <tr style="background:#f1f5f9;text-align:left;">
+
+                        <th style="padding:14px;border-bottom:1px solid #e2e8f0;">
+                            Permission
+                        </th>
+
+                        <th style="padding:14px;border-bottom:1px solid #e2e8f0;">
+                            Access
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in permissions %}
+
+                        <tr>
+
+                            <td style="
+                                padding:14px;
+                                border-bottom:1px solid #e2e8f0;
+                            ">
+                                {{ item.label }}
+                            </td>
+
+                            <td style="
+                                padding:14px;
+                                border-bottom:1px solid #e2e8f0;
+                            ">
+
+                                {% if item.allowed %}
+
+                                    <span style="
+                                        display:inline-block;
+                                        padding:6px 10px;
+                                        border-radius:6px;
+                                        background:#dcfce7;
+                                        color:#166534;
+                                        font-weight:bold;
+                                        font-size:13px;
+                                    ">
+                                        Allowed
+                                    </span>
+
+                                {% else %}
+
+                                    <span style="
+                                        display:inline-block;
+                                        padding:6px 10px;
+                                        border-radius:6px;
+                                        background:#f1f5f9;
+                                        color:#475569;
+                                        font-weight:bold;
+                                        font-size:13px;
+                                    ">
+                                        Not Allowed
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- Note -->
+
+    <div style="
+        margin-top:20px;
+        padding:18px;
+        background:#f8fafc;
+        border:1px solid #e2e8f0;
+        border-radius:10px;
+    ">
+
+        <strong>Need different permissions?</strong>
+
+        <p style="margin-bottom:0;color:#64748b;">
+            An administrator can open Django Admin, select Accounts → Roles,
+            and update the permissions assigned to your hospital role.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

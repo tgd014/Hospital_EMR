@@ -1,0 +1,206 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration | Hospital Portal</title>
+
+    <style>
+        .login-prompt {
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #edf1ee;
+        text-align: center;
+        font-size: 13px;
+        color: #64748b;
+        }
+
+        .login-prompt a {
+        display: inline-block;
+        margin-left: 5px;
+        color: #244F43;
+        font-weight: 700;
+        text-decoration: none;
+        transition: color 0.2s ease;
+        }
+
+        .login-prompt a:hover {
+        color: #193c32;
+        text-decoration: underline;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 16px;
+            min-height: 100vh;
+            background: #E8F0EB;
+            font-family: Arial, sans-serif;
+            color: #263C34;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            padding: 35px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 5px 25px rgba(36, 79, 67, 0.10);
+        }
+
+        .brand {
+            text-align: center;
+            color: #244F43;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718078;
+            margin: 8px 0 30px;
+        }
+
+        h2 {
+            color: #244F43;
+            margin-bottom: 8px;
+        }
+
+        .intro {
+            color: #68766E;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+            color: #36594A;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #CBD8CF;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #244F43;
+            box-shadow: 0 0 0 2px rgba(36, 79, 67, 0.10);
+        }
+
+        .help {
+            font-size: 12px;
+            color: #718078;
+            margin-top: 5px;
+        }
+
+        .errorlist,
+        .form-errors {
+            color: #A52A2A;
+            font-size: 13px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #244F43;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        button:hover {
+            background: #193D33;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #718078;
+        }
+
+        .footer a {
+            color: #244F43;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="brand">Hospital Patient Portal</div>
+    <div class="subtitle">Your healthcare information, securely connected.</div>
+
+    <h2>Create your patient account</h2>
+
+    <p class="intro">
+        Submit your information to request access to your hospital
+        medical record. Hospital staff must verify your identity
+        before your account can be activated.
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="form-errors">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% for field in form %}
+            <div class="field">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <div class="help">{{ field.help_text }}</div>
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="form-errors">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Submit Registration Request</button>
+    </form>
+
+    <div class="login-prompt">
+    <span>Already registered?</span>
+    <a href="{% url 'patient_portal_login' %}">
+        Sign in to your account
+    </a>
+    </div>
+
+</div>
+</body>
+</html>

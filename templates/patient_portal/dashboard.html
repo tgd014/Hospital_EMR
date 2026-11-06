@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Patient Portal</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #E8F0EB;
+            color: #26352E;
+        }
+
+        .header {
+            background: #244F43;
+            color: white;
+            padding: 22px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hospital-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            margin-top: 5px;
+            color: #D7E6DD;
+        }
+
+        .logout-button {
+            background: white;
+            color: #244F43;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: #E8F0EB;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 38px auto;
+            padding: 0 24px 48px;
+        }
+
+        .welcome {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            color: #477B66;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            color: #244F43;
+            font-size: 30px;
+            margin: 10px 0;
+        }
+
+        .subtitle {
+            color: #65766C;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #D5E2D9;
+            border-radius: 12px;
+            padding: 26px;
+            margin-bottom: 22px;
+        }
+
+        .card h2 {
+            color: #244F43;
+            font-size: 20px;
+            margin: 0 0 22px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .detail-label {
+            color: #718078;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .detail-value {
+            color: #26352E;
+            font-size: 15px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .notice {
+            background: #F1F6F2;
+            border-left: 4px solid #6B9B7E;
+            border-radius: 5px;
+            padding: 16px;
+            color: #52675A;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 18px 20px;
+            }
+
+            .page {
+                margin-top: 26px;
+                padding: 0 16px 32px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <div>
+            <div class="hospital-name">Hospital Patient Portal</div>
+            <div class="header-subtitle">Your personal health information</div>
+        </div>
+
+        <form method="post" action="{% url 'patient_portal_logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">
+                Logout
+            </button>
+        </form>
+    </header>
+
+    <main class="page">
+
+        <section class="welcome">
+            <div class="eyebrow">Patient Portal</div>
+
+            <h1>
+                Welcome, {{ patient.first_name }}
+                {% if patient.middle_name %}{{ patient.middle_name }} {% endif %}
+                {{ patient.last_name }}
+            </h1>
+
+            <p class="subtitle">
+                This is your personal patient portal.
+                You can view the patient information currently linked
+                to your hospital account.
+            </p>
+        </section>
+
+        <section class="card">
+            <h2>My Patient Information</h2>
+
+            <div class="details-grid">
+
+                <div>
+                    <div class="detail-label">Medical Record Number</div>
+                    <div class="detail-value">
+                        {{ patient.medical_record_number }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-label">Date of Birth</div>
+                    <div class="detail-value">
+                        {{ patient.date_of_birth|date:"d M Y" }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-label">First Name</div>
+                    <div class="detail-value">
+                        {{ patient.first_name }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-label">Last Name</div>
+                    <div class="detail-value">
+                        {{ patient.last_name }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-label">Phone</div>
+                    <div class="detail-value">
+                        {{ patient.phone|default:"Not provided" }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">
+                        {{ patient.email|default:"Not provided" }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="detail-label">Address</div>
+                    <div class="detail-value">
+                        {{ patient.address|default:"Not provided" }}
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="notice">
+            Your information is displayed from the patient record
+            linked to your approved account. If any information is
+            incorrect, please contact the hospital.
+        </div>
+
+    </main>
+
+</body>
+</html>

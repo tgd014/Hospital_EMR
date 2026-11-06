@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Prescribe Medication - Hospital EMR{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a href="{% url 'encounter_detail' encounter.id %}" style="color:#1f4e79;text-decoration:none;font-weight:bold;">&larr; Back to Encounter</a>
+    <div style="max-width:900px;margin:20px auto;background:#fff;padding:26px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+        <h1 style="margin-top:0;color:#1f4e79;">Prescribe Medication</h1>
+        <p>Patient: <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>{% if patient.medical_record_number %} · MRN: {{ patient.medical_record_number }}{% endif %}</p>
+        {% if error %}<div role="alert" style="background:#fee2e2;color:#991b1b;padding:12px;border-radius:6px;margin:16px 0;">{{ error }}</div>{% endif %}
+        <form method="post">{% csrf_token %}
+            <label for="medication-search">Search RxNorm medications or enter a local medicine name *</label>
+            <input id="medication-search" name="medication_name" required maxlength="500" autocomplete="off" value="{{ request.POST.medication_name }}" placeholder="Type at least 2 letters to search RxNorm" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin:6px 0;">
+            <input type="hidden" id="rxnorm-medication-id" name="rxnorm_medication_id" value="{{ request.POST.rxnorm_medication_id }}">
+            <div id="rxnorm-results" role="listbox" aria-label="RxNorm medication results" style="position:relative;z-index:2;"></div>
+            <p id="rxnorm-selection" style="color:#64748b;font-size:13px;margin:4px 0 18px;">Choose a catalog result to link an RxNorm concept. You can enter a local brand if it is not listed.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                <label>Strength<input id="prescription-strength" name="strength" maxlength="100" placeholder="e.g., 500 mg" value="{{ request.POST.strength }}" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;"></label>
+                <label>Dosage *<input name="dosage" required maxlength="100" placeholder="e.g., 1 tablet" value="{{ request.POST.dosage }}" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;"></label>
+                <label>Route *<select name="route" required style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;">{% for value,label in route_choices %}<option value="{{ value }}" {% if value == selected_route %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+                <label>Frequency *<input name="frequency" required maxlength="100" placeholder="e.g., twice daily" value="{{ request.POST.frequency }}" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;"></label>
+                <label>Duration<input name="duration" maxlength="100" placeholder="e.g., 5 days" value="{{ request.POST.duration }}" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;"></label>
+                <label>Quantity *<input type="number" name="quantity" required min="0.01" step="0.01" value="{{ request.POST.quantity }}" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;"></label>
+            </div>
+            <label style="display:block;margin-top:18px;">Instructions<textarea name="instructions" rows="4" style="display:block;box-sizing:border-box;width:100%;padding:10px;margin-top:6px;">{{ request.POST.instructions }}</textarea></label>
+            <p style="color:#64748b;font-size:13px;">Saving creates an active prescription only; dispensing is recorded separately.</p>
+            <button type="submit" style="background:#198754;color:#fff;border:0;padding:12px 20px;border-radius:6px;font-weight:bold;cursor:pointer;">Save Prescription</button>
+        </form>
+        <script>
+            const searchInput = document.getElementById("medication-search");
+            const rxnormId = document.getElementById("rxnorm-medication-id");
+            const resultsBox = document.getElementById("rxnorm-results");
+            const selectionNote = document.getElementById("rxnorm-selection");
+            let searchTimer;
+
+            searchInput.addEventListener("input", () => {
+                rxnormId.value = "";
+                selectionNote.textContent = "Choose a catalog result to link an RxNorm concept. You can enter a local brand if it is not listed.";
+                clearTimeout(searchTimer);
+                const query = searchInput.value.trim();
+                resultsBox.replaceChildren();
+                if (query.length < 2) return;
+                searchTimer = setTimeout(async () => {
+                    try {
+                        const response = await fetch("{% url 'rxnorm_medication_search' %}?q=" + encodeURIComponent(query), {headers: {"Accept": "application/json"}});
+                        if (!response.ok) return;
+                        const data = await response.json();
+                        data.results.forEach((item) => {
+                            const option = document.createElement("button");
+                            option.type = "button";
+                            option.setAttribute("role", "option");
+                            option.textContent = item.name + " · " + item.term_type + " · RxCUI " + item.rxcui;
+                            option.style.cssText = "display:block;width:100%;text-align:left;padding:10px;background:#fff;border:1px solid #cbd5e1;cursor:pointer;";
+                            option.addEventListener("click", () => {
+                                searchInput.value = item.name;
+                                rxnormId.value = item.rxcui;
+                                selectionNote.textContent = "Linked to RxNorm " + item.rxcui + " (" + item.term_type + ").";
+                                resultsBox.replaceChildren();
+                            });
+                            resultsBox.appendChild(option);
+                        });
+                        if (!data.results.length) {
+                            const note = document.createElement("div");
+                            note.textContent = "No RxNorm matches. You can continue with the local medicine name entered above.";
+                            note.style.cssText = "padding:10px;color:#64748b;background:#f8fafc;";
+                            resultsBox.appendChild(note);
+                        }
+                    } catch (error) {
+                        resultsBox.replaceChildren();
+                    }
+                }, 200);
+            });
+        </script>
+    </div>
+</div>
+{% endblock %}

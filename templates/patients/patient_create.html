@@ -1,233 +1,392 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+Register Patient - Hospital EMR
+{% endblock %}
 
-    <title>Hospital EMR - Register Patient</title>
+{% block content %}
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<div class="container">
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f6f8;
-            color: #333;
-        }
+    <div style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    ">
 
-        .header {
-            height: 65px;
-            background: #1f4e79;
-            color: white;
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-        }
+        <h2 style="margin: 0;">
+            Register Patient
+        </h2>
 
-        .hospital-name {
-            font-size: 22px;
-            font-weight: bold;
-        }
+        <a
+            href="/patients/"
+            style="
+                color: #1f4e79;
+                text-decoration: none;
+                font-weight: bold;
+            "
+        >
+            ← Back to Patients
+        </a>
 
-        .main {
-            max-width: 800px;
-            margin: auto;
-            padding: 30px;
-        }
+    </div>
 
-        .form-container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
 
-        h1 {
+    <div style="
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+
+        <h3 style="
             margin-top: 0;
+            color: #1f4e79;
+        ">
+            Patient Information
+        </h3>
+
+
+        <p style="
+            color: #777;
+            font-size: 14px;
             margin-bottom: 25px;
-        }
+        ">
+            Enter the patient's demographic information below.
+        </p>
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
 
-        .field {
-            margin-bottom: 20px;
-        }
+        <form method="post">
 
-        .field.full {
-            grid-column: 1 / -1;
-        }
+            {% csrf_token %}
 
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 7px;
-        }
 
-        input,
-        textarea {
-            width: 100%;
-            padding: 11px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 15px;
-        }
+            <!-- Medical Record Number -->
 
-        textarea {
-            min-height: 90px;
-            resize: vertical;
-        }
+            <div style="margin-bottom: 20px;">
 
-        .buttons {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
+                <label
+                    for="medical_record_number"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Medical Record Number
+                </label>
 
-        button {
-            background: #1f4e79;
-            color: white;
-            border: none;
-            padding: 12px 22px;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+                <input
+                    type="text"
+                    id="medical_record_number"
+                    name="medical_record_number"
+                    required
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                    "
+                >
 
-        .cancel {
-            padding: 12px 22px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #555;
-            border: 1px solid #ccc;
-        }
+            </div>
 
-        @media (max-width: 650px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
 
-            .field.full {
-                grid-column: auto;
-            }
-        }
-    </style>
-</head>
+            <!-- Name -->
 
-<body>
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            ">
 
-    <header class="header">
-        <div class="hospital-name">
-            Hospital EMR
-        </div>
-    </header>
 
-    <main class="main">
+                <!-- First Name -->
 
-        <div class="form-container">
+                <div style="margin-bottom: 20px;">
 
-            <h1>
-                Register New Patient
-            </h1>
+                    <label
+                        for="first_name"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        First Name
+                    </label>
 
-            <form method="post">
-
-                {% csrf_token %}
-
-                <div class="form-row">
-
-                    <div class="field">
-                        <label>Medical Record Number</label>
-                        <input
-                            type="text"
-                            name="medical_record_number"
-                            required
-                        >
-                    </div>
-
-                    <div class="field">
-                        <label>Date of Birth</label>
-                        <input
-                            type="date"
-                            name="date_of_birth"
-                            required
-                        >
-                    </div>
-
-                    <div class="field">
-                        <label>First Name</label>
-                        <input
-                            type="text"
-                            name="first_name"
-                            required
-                        >
-                    </div>
-
-                    <div class="field">
-                        <label>Middle Name</label>
-                        <input
-                            type="text"
-                            name="middle_name"
-                        >
-                    </div>
-
-                    <div class="field">
-                        <label>Last Name</label>
-                        <input
-                            type="text"
-                            name="last_name"
-                            required
-                        >
-                    </div>
-
-                    <div class="field">
-                        <label>Phone</label>
-                        <input
-                            type="text"
-                            name="phone"
-                        >
-                    </div>
-
-                    <div class="field full">
-                        <label>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                        >
-                    </div>
-
-                    <div class="field full">
-                        <label>Address</label>
-                        <textarea name="address"></textarea>
-                    </div>
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        required
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                        "
+                    >
 
                 </div>
 
-                <div class="buttons">
 
-                    <button type="submit">
-                        Register Patient
-                    </button>
+                <!-- Middle Name -->
 
-                    <a href="/patients/" class="cancel">
-                        Cancel
-                    </a>
+                <div style="margin-bottom: 20px;">
+
+                    <label
+                        for="middle_name"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Middle Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="middle_name"
+                        name="middle_name"
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                        "
+                    >
 
                 </div>
 
-            </form>
 
-        </div>
+                <!-- Last Name -->
 
-    </main>
+                <div style="margin-bottom: 20px;">
 
-</body>
+                    <label
+                        for="last_name"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Last Name
+                    </label>
 
-</html>
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        required
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                        "
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Date of Birth -->
+
+            <div style="margin-bottom: 20px;">
+
+                <label
+                    for="date_of_birth"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Date of Birth
+                </label>
+
+                <input
+                    type="date"
+                    id="date_of_birth"
+                    name="date_of_birth"
+                    required
+                    style="
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                    "
+                >
+
+            </div>
+
+
+            <!-- Phone and Email -->
+
+            <div style="
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            ">
+
+
+                <!-- Phone -->
+
+                <div style="margin-bottom: 20px;">
+
+                    <label
+                        for="phone"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Phone
+                    </label>
+
+                    <input
+                        type="text"
+                        id="phone"
+                        name="phone"
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                        "
+                    >
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div style="margin-bottom: 20px;">
+
+                    <label
+                        for="email"
+                        style="
+                            display: block;
+                            font-weight: bold;
+                            margin-bottom: 7px;
+                        "
+                    >
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        style="
+                            width: 100%;
+                            box-sizing: border-box;
+                            padding: 11px;
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            font-size: 15px;
+                        "
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Address -->
+
+            <div style="margin-bottom: 25px;">
+
+                <label
+                    for="address"
+                    style="
+                        display: block;
+                        font-weight: bold;
+                        margin-bottom: 7px;
+                    "
+                >
+                    Address
+                </label>
+
+                <textarea
+                    id="address"
+                    name="address"
+                    rows="4"
+                    style="
+                        width: 100%;
+                        box-sizing: border-box;
+                        padding: 11px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        font-size: 15px;
+                        resize: vertical;
+                    "
+                ></textarea>
+
+            </div>
+
+
+            <!-- Buttons -->
+
+            <div style="
+                display: flex;
+                gap: 10px;
+            ">
+
+                <button
+                    type="submit"
+                    style="
+                        background-color: #198754;
+                        color: white;
+                        border: none;
+                        padding: 12px 20px;
+                        border-radius: 6px;
+                        font-size: 15px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    "
+                >
+                    Register Patient
+                </button>
+
+
+                <a
+                    href="/patients/"
+                    style="
+                        background-color: #6c757d;
+                        color: white;
+                        text-decoration: none;
+                        padding: 12px 20px;
+                        border-radius: 6px;
+                        font-size: 15px;
+                    "
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

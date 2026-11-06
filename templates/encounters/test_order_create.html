@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="max-width:900px;margin:0 auto;padding:24px;">
+
+    <div style="margin-bottom:24px;">
+
+        <a href="{% url 'encounter_detail' encounter.id %}"
+           style="color:#1f4e79;text-decoration:none;">
+            &larr; Back to Encounter
+        </a>
+
+        <h1 style="margin-top:16px;margin-bottom:8px;">
+            Order Diagnostic Test
+        </h1>
+
+        <p style="color:#64748b;margin:0;">
+            Patient:
+            <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>
+            {% if patient.medical_record_number %}
+                | MRN: {{ patient.medical_record_number }}
+            {% endif %}
+        </p>
+
+    </div>
+
+    {% if error %}
+        <div style="background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:14px;border-radius:8px;margin-bottom:20px;">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;">
+
+        <!-- LOINC Catalog Search -->
+
+        <div style="margin-bottom:24px;padding:18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+
+            <h2 style="margin:0 0 8px;font-size:18px;">
+                Search Standardized Test Catalog
+            </h2>
+
+            <p style="color:#64748b;font-size:14px;margin:0 0 14px;">
+                Search by test name, component, or LOINC code.
+            </p>
+
+            <!-- Selected test summary -->
+            <div id="selected-test-summary"
+                 style="display:none;padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;">
+
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+
+                    <div style="flex:1;min-width:200px;">
+                        <p style="margin:0 0 6px;color:#047857;font-size:12px;font-weight:bold;text-transform:uppercase;">
+                            Selected Test
+                        </p>
+
+                        <strong id="selected-test-name"
+                                style="display:block;color:#1e293b;">
+                        </strong>
+
+                        <span id="selected-test-code"
+                              style="display:block;color:#475569;font-size:13px;margin-top:5px;">
+                        </span>
+                    </div>
+
+                    <button type="button"
+                            id="change-test-button"
+                            style="background:white;color:#1f4e79;border:1px solid #1f4e79;padding:9px 12px;border-radius:6px;font-weight:bold;cursor:pointer;">
+                        Change Test
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- Search form -->
+            <div id="catalog-search-area">
+
+                <form method="get"
+                      id="catalog-search-form"
+                      style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+
+                    <input
+                        type="text"
+                        name="q"
+                        id="catalog-search-input"
+                        value="{{ search_query }}"
+                        placeholder="Example: glucose, CBC, or LOINC code"
+                        aria-label="Search LOINC catalog"
+                        style="box-sizing:border-box;flex:1;min-width:220px;padding:12px;border:1px solid #cbd5e1;border-radius:6px;"
+                    >
+
+                    <button
+                        type="submit"
+                        style="background:#334155;color:white;border:none;padding:12px 18px;border-radius:7px;font-weight:bold;cursor:pointer;"
+                    >
+                        Search Catalog
+                    </button>
+
+                </form>
+
+                {% if search_query %}
+                    {% if lab_tests %}
+
+                        <p style="font-size:14px;color:#475569;margin:0 0 12px;">
+                            {{ lab_tests|length }} matching result{{ lab_tests|length|pluralize }} shown (maximum 50).
+                        </p>
+
+                        <div id="catalog-results"
+                             style="display:flex;flex-direction:column;gap:10px;">
+
+                            {% for test in lab_tests %}
+
+                                <label class="catalog-test-option"
+                                       data-test-id="{{ test.id }}"
+                                       data-test-name="{{ test.long_common_name|escape }}"
+                                       data-test-code="{{ test.loinc_code|escape }}"
+                                       style="display:flex;gap:10px;align-items:flex-start;padding:12px;background:white;border:1px solid #cbd5e1;border-radius:7px;cursor:pointer;">
+
+                                    <input
+                                        type="radio"
+                                        name="catalog_test_choice"
+                                        value="{{ test.id }}"
+                                        style="margin-top:4px;flex-shrink:0;"
+                                    >
+
+                                    <span style="display:block;">
+
+                                        <strong style="display:block;color:#1e293b;">
+                                            {{ test.long_common_name }}
+                                        </strong>
+
+                                        <span style="display:block;font-size:13px;color:#64748b;margin-top:4px;">
+                                            LOINC: {{ test.loinc_code }}
+
+                                            {% if test.component %}
+                                                | Component: {{ test.component }}
+                                            {% endif %}
+
+                                            {% if test.system %}
+                                                | System: {{ test.system }}
+                                            {% endif %}
+                                        </span>
+
+                                        {% if test.short_name %}
+                                            <span style="display:block;font-size:13px;color:#64748b;margin-top:3px;">
+                                                Short name: {{ test.short_name }}
+                                            </span>
+                                        {% endif %}
+
+                                    </span>
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p style="color:#b45309;margin:0;">
+                            No matching catalog tests were found. Try another search or enter a test name manually below.
+                        </p>
+
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <!-- Test Order Form -->
+
+        <form method="post" id="test-order-form">
+
+            {% csrf_token %}
+
+            <!-- The selected catalog ID is submitted to Django -->
+            <input type="hidden" name="lab_test_id" id="lab-test-id" value="">
+
+            <!-- Test Category -->
+
+            <div style="margin-bottom:20px;">
+
+                <label for="test_category"
+                       style="display:block;font-weight:bold;margin-bottom:8px;">
+                    Test Type
+                </label>
+
+                <select
+                    id="test_category"
+                    name="test_category"
+                    style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;background:white;"
+                >
+                    <option value="laboratory" selected>Laboratory</option>
+                    <option value="imaging">Imaging</option>
+                    <option value="other">Other</option>
+                </select>
+
+            </div>
+
+            <!-- Test Name -->
+
+            <div style="margin-bottom:20px;">
+
+                <label for="test_name"
+                       style="display:block;font-weight:bold;margin-bottom:8px;">
+                    Test Name
+                </label>
+
+                <input
+                    type="text"
+                    id="test_name"
+                    name="test_name"
+                    placeholder="Example: CBC, Chest X-Ray, HbA1c"
+                    style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;"
+                >
+
+                <p style="font-size:13px;color:#64748b;margin:6px 0 0;">
+                    Select a catalog test above or enter a test name manually.
+                </p>
+
+            </div>
+
+            <!-- Priority -->
+
+            <div style="margin-bottom:20px;">
+
+                <label for="priority"
+                       style="display:block;font-weight:bold;margin-bottom:8px;">
+                    Priority
+                </label>
+
+                <select
+                    id="priority"
+                    name="priority"
+                    style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;background:white;"
+                >
+                    <option value="routine" selected>Routine</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="stat">STAT</option>
+                </select>
+
+            </div>
+
+            <!-- Clinical Indication -->
+
+            <div style="margin-bottom:20px;">
+
+                <label for="clinical_indication"
+                       style="display:block;font-weight:bold;margin-bottom:8px;">
+                    Clinical Indication
+                </label>
+
+                <textarea
+                    id="clinical_indication"
+                    name="clinical_indication"
+                    rows="4"
+                    placeholder="Why is this test being ordered?"
+                    style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;"
+                ></textarea>
+
+            </div>
+
+            <!-- Notes -->
+
+            <div style="margin-bottom:20px;">
+
+                <label for="notes"
+                       style="display:block;font-weight:bold;margin-bottom:8px;">
+                    Additional Notes
+                </label>
+
+                <textarea
+                    id="notes"
+                    name="notes"
+                    rows="4"
+                    placeholder="Any additional instructions for the lab or imaging department."
+                    style="box-sizing:border-box;width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:6px;"
+                ></textarea>
+
+            </div>
+
+            <!-- Buttons -->
+
+            <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;">
+
+                <a href="{% url 'encounter_detail' encounter.id %}"
+                   style="display:inline-block;background:#64748b;color:white;text-decoration:none;padding:12px 18px;border-radius:7px;font-weight:bold;">
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    style="background:#1f4e79;color:white;border:none;padding:12px 18px;border-radius:7px;font-weight:bold;cursor:pointer;"
+                >
+                    Place Test Order
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchArea = document.getElementById("catalog-search-area");
+    const searchForm = document.getElementById("catalog-search-form");
+    const searchInput = document.getElementById("catalog-search-input");
+    const results = document.getElementById("catalog-results");
+
+    const summary = document.getElementById("selected-test-summary");
+    const selectedName = document.getElementById("selected-test-name");
+    const selectedCode = document.getElementById("selected-test-code");
+    const hiddenLabTestId = document.getElementById("lab-test-id");
+    const testNameInput = document.getElementById("test_name");
+    const changeButton = document.getElementById("change-test-button");
+    const orderForm = document.getElementById("test-order-form");
+
+    let selectedTest = null;
+
+    function selectTest(testId, testName, testCode) {
+        selectedTest = {
+            id: testId,
+            name: testName,
+            code: testCode
+        };
+
+        hiddenLabTestId.value = testId;
+        testNameInput.value = testName;
+
+        selectedName.textContent = testName;
+        selectedCode.textContent = "LOINC: " + testCode;
+
+        summary.style.display = "block";
+        searchArea.style.display = "none";
+    }
+
+    function showSearch() {
+        summary.style.display = "none";
+        searchArea.style.display = "block";
+
+        if (selectedTest) {
+            const previousRadio = document.querySelector(
+                'input[name="catalog_test_choice"][value="' +
+                selectedTest.id + '"]'
+            );
+
+            if (previousRadio) {
+                previousRadio.checked = true;
+            }
+        }
+
+        searchInput.focus();
+    }
+
+    document.querySelectorAll(".catalog-test-option").forEach(function (option) {
+        const radio = option.querySelector(
+            'input[name="catalog_test_choice"]'
+        );
+
+        radio.addEventListener("change", function () {
+            selectTest(
+                option.dataset.testId,
+                option.dataset.testName,
+                option.dataset.testCode
+            );
+        });
+
+        option.addEventListener("click", function (event) {
+            if (event.target !== radio) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event("change"));
+            }
+        });
+    });
+
+    changeButton.addEventListener("click", showSearch);
+
+    // Restore the selected test if Django re-renders the page after
+    // a validation error.
+    {% if selected_lab_test %}
+        selectTest(
+            "{{ selected_lab_test.id|escapejs }}",
+            "{{ selected_lab_test.long_common_name|escapejs }}",
+            "{{ selected_lab_test.loinc_code|escapejs }}"
+        );
+    {% endif %}
+
+    // If the clinician edits the name manually, clear the catalog ID
+    // so the backend does not silently order the previous selection.
+    testNameInput.addEventListener("input", function () {
+        if (selectedTest && testNameInput.value !== selectedTest.name) {
+            selectedTest = null;
+            hiddenLabTestId.value = "";
+            summary.style.display = "none";
+        }
+    });
+
+    // Do not submit a stale catalog ID if the selected test was changed.
+    orderForm.addEventListener("submit", function () {
+        if (selectedTest && testNameInput.value !== selectedTest.name) {
+            hiddenLabTestId.value = "";
+        }
+    });
+});
+</script>
+
+{% endblock %}

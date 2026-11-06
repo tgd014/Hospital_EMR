@@ -1,0 +1,113 @@
+
+{% extends "base.html" %}
+
+{% block title %}Patient Registration Requests{% endblock %}
+
+{% block content %}
+
+<style>
+    .request-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        margin-top: 20px;
+    }
+
+    .request-table th,
+    .request-table td {
+        padding: 13px;
+        border-bottom: 1px solid #e5e9ed;
+        text-align: left;
+    }
+
+    .request-table th {
+        background: #edf2f6;
+        color: #29445b;
+    }
+
+    .status-pending {
+        color: #946200;
+        font-weight: bold;
+    }
+
+    .status-approved {
+        color: #247346;
+        font-weight: bold;
+    }
+
+    .status-rejected {
+        color: #a52a2a;
+        font-weight: bold;
+    }
+
+    .review-link {
+        color: #1f4e79;
+        font-weight: bold;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+</style>
+
+<h1>Patient Registration Requests</h1>
+
+<p>Review patient portal applications and verify their identity.</p>
+
+<div class="table-wrapper">
+    <table class="request-table">
+        <thead>
+            <tr>
+                <th>Applicant</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>MRN Provided</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in registration_requests %}
+                <tr>
+                    <td>
+                        {{ item.first_name }} {{ item.last_name }}
+                    </td>
+
+                    <td>{{ item.email }}</td>
+                    <td>{{ item.phone }}</td>
+
+                    <td>
+                        {{ item.medical_record_number|default:"Not provided" }}
+                    </td>
+
+                    <td>
+                        <span class="status-{{ item.status }}">
+                            {{ item.get_status_display }}
+                        </span>
+                    </td>
+
+                    <td>{{ item.submitted_at|date:"d M Y H:i" }}</td>
+
+                    <td>
+                        {% if item.status == "pending" %}
+                            <a class="review-link"
+                               href="{% url 'patient_registration_review' item.id %}">
+                                Review
+                            </a>
+                        {% else %}
+                            Reviewed
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="7">No registration requests found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

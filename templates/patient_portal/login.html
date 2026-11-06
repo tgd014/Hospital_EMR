@@ -1,0 +1,327 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Patient Login | Hospital EMR</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #E8F0EB;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .brand-mark {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 15px;
+            border-radius: 14px;
+            background: #244F43;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .brand-name {
+            color: #244F43;
+            font-size: 23px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .brand-subtitle {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border: 1px solid #dce7df;
+            border-radius: 14px;
+            padding: 32px;
+            box-shadow: 0 8px 25px rgba(36, 79, 67, 0.07);
+        }
+
+        .login-title {
+            color: #244F43;
+            font-size: 25px;
+            margin: 0 0 8px;
+        }
+
+        .login-description {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0 0 25px;
+        }
+
+        .form-field {
+            margin-bottom: 19px;
+        }
+
+        .form-field label {
+            display: block;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .form-field input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .form-field input:focus {
+            outline: 3px solid #dcebe1;
+            border-color: #244F43;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 5px;
+            background: #244F43;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .login-button:hover {
+            background: #193c32;
+        }
+
+        .form-error {
+            color: #b42318;
+            background: #fff1f0;
+            border: 1px solid #fecdca;
+            border-radius: 7px;
+            padding: 11px;
+            margin-bottom: 18px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Patient portal account links */
+        .portal-links {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #edf1ee;
+            text-align: center;
+        }
+
+        .forgot-password {
+            margin-bottom: 19px;
+        }
+
+        .forgot-password a {
+            color: #547568;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            color: #193c32;
+            text-decoration: underline;
+        }
+
+        .register-prompt {
+            color: #64748b;
+            font-size: 13px;
+            margin: 0 0 10px;
+        }
+
+        .register-button {
+            display: inline-block;
+            padding: 11px 20px;
+            border: 1px solid #244F43;
+            border-radius: 8px;
+            color: #244F43;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .register-button:hover {
+            background: #244F43;
+            color: white;
+        }
+
+        .login-footer {
+            text-align: center;
+            color: #84958a;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 24px 20px;
+            }
+
+            .brand-name {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <header class="brand">
+        <div class="brand-mark">+</div>
+
+        <div class="brand-name">
+            Hospital EMR
+        </div>
+
+        <div class="brand-subtitle">
+            Patient Portal
+        </div>
+    </header>
+
+    <main class="login-card">
+
+        <h1 class="login-title">
+            Welcome Back
+        </h1>
+
+        <p class="login-description">
+            Sign in to securely access your patient portal.
+        </p>
+
+        {% if form.errors %}
+            <div class="form-error" role="alert">
+                Your username or password was not recognized.
+                Please check your details and try again.
+            </div>
+        {% endif %}
+
+        {% if next %}
+            {% if user.is_authenticated %}
+                <div class="form-error">
+                    Your account does not have permission to access
+                    that page.
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-field">
+                <label for="id_username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    id="id_username"
+                    autocomplete="username"
+                    placeholder="Enter your username"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="form-field">
+                <label for="id_password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    id="id_password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                >
+            </div>
+
+            <input
+                type="hidden"
+                name="next"
+                value="{{ next|default:'' }}"
+            >
+
+            <button type="submit" class="login-button">
+                Sign In
+            </button>
+        </form>
+
+        <div class="portal-links">
+
+            <div class="forgot-password">
+                <a href="{% url 'patient_password_reset' %}">
+                    Forgot your password?
+                </a>
+            </div>
+
+            <p class="register-prompt">
+                Don't have a patient account yet?
+            </p>
+
+            <a
+                href="{% url 'patient_register' %}"
+                class="register-button"
+            >
+                Create Patient Account
+            </a>
+
+        </div>
+
+    </main>
+
+    <footer class="login-footer">
+        Hospital EMR Patient Portal
+        <br>
+        Your health information is private and protected.
+    </footer>
+
+</div>
+
+</body>
+</html>

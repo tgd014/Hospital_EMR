@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratory Result | Hospital EMR</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #263445; margin: 0; }
+        header { background: #17365d; color: white; padding: 20px 28px; }
+        main { max-width: 850px; margin: 28px auto; padding: 0 20px; }
+        .panel { background: white; padding: 24px; border-radius: 8px; }
+        .status { display: inline-block; padding: 6px 10px; border-radius: 5px; background: #dcfce7; color: #166534; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+        th { width: 35%; background: #f8fafc; }
+        .back { color: white; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Laboratory Result</h1>
+    <a class="back" href="{% url 'lab_worklist' %}">← Back to Worklist</a>
+</header>
+<main>
+    <section class="panel">
+        <span class="status">Submitted — Final</span>
+        <h2>{{ test_order.test_name }}</h2>
+        <p><strong>Patient:</strong> {{ test_order.encounter.patient }}</p>
+        <p><strong>Medical Record No.:</strong> {{ test_order.encounter.patient.medical_record_number }}</p>
+
+        <table>
+            <tr><th>Result Type</th><td>{{ result.get_result_type_display }}</td></tr>
+            <tr><th>Result</th><td>{{ result.result_value|linebreaksbr }}</td></tr>
+            <tr><th>Units</th><td>{{ result.units|default:"—" }}</td></tr>
+            <tr><th>Reference Range</th><td>{{ result.reference_range|default:"—" }}</td></tr>
+            <tr><th>Interpretation</th><td>{{ result.get_abnormal_flag_display }}</td></tr>
+            <tr><th>Specimen</th><td>{{ result.specimen_type|default:"—" }}</td></tr>
+            <tr><th>Specimen ID</th><td>{{ result.specimen_id|default:"—" }}</td></tr>
+            <tr><th>Comments</th><td>{{ result.comments|default:"—"|linebreaksbr }}</td></tr>
+            <tr><th>Submitted By</th><td>{{ result.submitted_by|default:"Unknown" }}</td></tr>
+            <tr><th>Submitted At</th><td>{{ result.submitted_at|date:"Y-m-d H:i" }}</td></tr>
+        </table>
+
+        <p>This result has been submitted and is final in the current workflow.</p>
+        <p><a href="{% url 'encounter_detail' encounter_id=test_order.encounter.id %}">Open Patient Encounter</a></p>
+    </section>
+</main>
+</body>
+</html>
+{% endblock %}

@@ -1,335 +1,413 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>{{ patient.first_name }} {{ patient.last_name }} - Hospital EMR</title>
+{% block title %}
+{{ patient.first_name }} {{ patient.last_name }} - Hospital EMR
+{% endblock %}
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f8;
-            color: #333;
-        }
+{% block content %}
 
-        .header {
-            background-color: #1f4e79;
-            color: white;
-            padding: 20px 40px;
-        }
+<div class="container">
 
-        .header h1 {
-            margin: 0;
-            font-size: 26px;
-        }
+    <!-- Back to Patients -->
 
-        .header p {
-            margin: 5px 0 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .back-link {
+    <a
+        href="/patients/"
+        style="
             color: #1f4e79;
             text-decoration: none;
             font-weight: bold;
-        }
+        "
+    >
+        ← Back to Patients
+    </a>
 
-        .back-link:hover {
-            text-decoration: underline;
-        }
 
-        .patient-header {
-            background: white;
-            margin-top: 20px;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
+    <!-- Patient Header -->
 
-        .patient-header h2 {
-            margin: 0 0 5px;
+    <div style="
+        background: white;
+        margin-top: 20px;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+
+        <h2 style="
+            margin: 0 0 6px;
             font-size: 28px;
-        }
+            color: #1f4e79;
+        ">
 
-        .mrn {
+            {{ patient.first_name }}
+
+            {% if patient.middle_name %}
+                {{ patient.middle_name }}
+            {% endif %}
+
+            {{ patient.last_name }}
+
+        </h2>
+
+        <div style="
             color: #666;
             font-size: 14px;
-        }
+        ">
 
-        .section {
-            background: white;
-            margin-top: 20px;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
+            Medical Record Number:
+            {{ patient.medical_record_number }}
 
-        .section-header {
+        </div>
+
+    </div>
+
+
+    <!-- Patient Information -->
+
+    <div style="
+        background: white;
+        margin-top: 20px;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+
+        <h3 style="
+            margin-top: 0;
+            color: #1f4e79;
+        ">
+            Patient Information
+        </h3>
+
+
+        <div style="
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        ">
+
+
+            <!-- First Name -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    First Name
+                </div>
+
+                <div style="font-size: 15px;">
+                    {{ patient.first_name }}
+                </div>
+
+            </div>
+
+
+            <!-- Middle Name -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    Middle Name
+                </div>
+
+                <div style="font-size: 15px;">
+
+                    {% if patient.middle_name %}
+                        {{ patient.middle_name }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Last Name -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    Last Name
+                </div>
+
+                <div style="font-size: 15px;">
+                    {{ patient.last_name }}
+                </div>
+
+            </div>
+
+
+            <!-- Date of Birth -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    Date of Birth
+                </div>
+
+                <div style="font-size: 15px;">
+                    {{ patient.date_of_birth }}
+                </div>
+
+            </div>
+
+
+            <!-- Phone -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    Phone
+                </div>
+
+                <div style="font-size: 15px;">
+
+                    {% if patient.phone %}
+                        {{ patient.phone }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    Email
+                </div>
+
+                <div style="font-size: 15px;">
+
+                    {% if patient.email %}
+                        {{ patient.email }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- Address -->
+
+            <div style="
+                padding: 12px;
+                background-color: #f8fafc;
+                border-radius: 5px;
+                grid-column: span 2;
+            ">
+
+                <div style="
+                    font-size: 12px;
+                    color: #777;
+                    margin-bottom: 4px;
+                ">
+                    Address
+                </div>
+
+                <div style="font-size: 15px;">
+
+                    {% if patient.address %}
+                        {{ patient.address }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Encounters -->
+
+    <div style="
+        background: white;
+        margin-top: 20px;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    ">
+
+        <div style="
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-        }
+        ">
 
-        .section h3 {
-            margin: 0;
-            color: #1f4e79;
-            font-size: 20px;
-        }
+            <h3 style="
+                margin: 0;
+                color: #1f4e79;
+            ">
+                Encounters
+            </h3>
 
-        .new-encounter-button {
-            background-color: #198754;
-            color: white;
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-        }
 
-        .new-encounter-button:hover {
-            background-color: #157347;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .info-item {
-            padding: 10px;
-            background-color: #f8fafc;
-            border-radius: 5px;
-        }
-
-        .label {
-            font-size: 12px;
-            color: #777;
-            margin-bottom: 4px;
-        }
-
-        .value {
-            font-size: 15px;
-            font-weight: 500;
-        }
-
-        .encounter {
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-
-        .encounter:last-child {
-            margin-bottom: 0;
-        }
-
-        .encounter strong {
-            color: #1f4e79;
-        }
-
-        .empty {
-            color: #777;
-            padding: 10px 0;
-        }
-
-        @media (max-width: 700px) {
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .section-header {
-                align-items: flex-start;
-                gap: 15px;
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="header">
-        <h1>Hospital EMR</h1>
-        <p>Electronic Medical Record System</p>
-    </div>
-
-    <div class="container">
-
-        <a href="/patients/" class="back-link">
-            ← Back to Patients
-        </a>
-
-        <!-- Patient Header -->
-        <div class="patient-header">
-
-            <h2>
-                {{ patient.first_name }}
-
-                {% if patient.middle_name %}
-                    {{ patient.middle_name }}
-                {% endif %}
-
-                {{ patient.last_name }}
-            </h2>
-
-            <div class="mrn">
-                Medical Record Number:
-                {{ patient.medical_record_number }}
-            </div>
+            <a
+                href="/patients/{{ patient.id }}/encounters/new/"
+                style="
+                    background-color: #198754;
+                    color: white;
+                    text-decoration: none;
+                    padding: 10px 16px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    font-size: 14px;
+                "
+            >
+                + Start New Encounter
+            </a>
 
         </div>
 
 
-        <!-- Patient Information -->
-        <div class="section">
+        {% if encounters %}
 
-            <div class="section-header">
-                <h3>Patient Information</h3>
-            </div>
+            {% for encounter in encounters %}
 
-            <div class="info-grid">
+                <div style="
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    padding: 15px;
+                    margin-bottom: 10px;
+                ">
 
-                <div class="info-item">
-                    <div class="label">First Name</div>
-                    <div class="value">
-                        {{ patient.first_name }}
-                    </div>
-                </div>
+                    <strong style="
+                        color: #1f4e79;
+                    ">
+                        {{ encounter.get_encounter_type_display }}
+                    </strong>
 
-                <div class="info-item">
-                    <div class="label">Middle Name</div>
-                    <div class="value">
+                    <br>
 
-                        {% if patient.middle_name %}
-                            {{ patient.middle_name }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="label">Last Name</div>
-                    <div class="value">
-                        {{ patient.last_name }}
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="label">Date of Birth</div>
-                    <div class="value">
-                        {{ patient.date_of_birth }}
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="label">Phone</div>
-                    <div class="value">
-
-                        {% if patient.phone %}
-                            {{ patient.phone }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="label">Email</div>
-                    <div class="value">
-
-                        {% if patient.email %}
-                            {{ patient.email }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </div>
-                </div>
-
-                <div class="info-item">
-                    <div class="label">Address</div>
-                    <div class="value">
-
-                        {% if patient.address %}
-                            {{ patient.address }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Encounters -->
-        <div class="section">
-
-            <div class="section-header">
-
-                <h3>Encounters</h3>
-
-                <a
-                    href="/patients/{{ patient.id }}/encounters/new/"
-                    class="new-encounter-button"
-                >
-                    + Start New Encounter
-                </a>
-
-            </div>
-
-
-            {% if encounters %}
-
-                {% for encounter in encounters %}
-
-                    <div class="encounter">
-
-                        <strong>
-                            {{ encounter.get_encounter_type_display }}
-                        </strong>
-
-                        <br>
-
+                    <span>
                         Date:
                         {{ encounter.started_at }}
+                    </span>
 
-                        <br>
+                    <br>
 
+                    <span>
                         Status:
                         {{ encounter.get_status_display }}
+                    </span>
+
+                    <!-- Encounter Actions -->
+
+                    <div style="
+                        margin-top: 15px;
+                    ">
+
+                        <a
+                            href="{% url 'encounter_detail' encounter.id %}"
+                            style="
+                                display: inline-block;
+                                background-color: #1f4e79;
+                                color: white;
+                                text-decoration: none;
+                                padding: 9px 14px;
+                                border-radius: 6px;
+                                font-weight: bold;
+                                font-size: 14px;
+                                margin-right: 8px;
+                            "
+                        >
+                            Open Encounter
+                        </a>
+
+                        <a
+                            href="{% url 'vitals_create' encounter.id %}"
+                            style="
+                                display: inline-block;
+                                background-color: #198754;
+                                color: white;
+                                text-decoration: none;
+                                padding: 9px 14px;
+                                border-radius: 6px;
+                                font-weight: bold;
+                                font-size: 14px;
+                            "
+                        >
+                            Record / View Vital Signs
+                        </a>
 
                     </div>
 
-                {% endfor %}
-
-            {% else %}
-
-                <div class="empty">
-                    No encounters have been recorded for this patient.
                 </div>
 
-            {% endif %}
+            {% endfor %}
 
-        </div>
+        {% else %}
+
+            <div style="
+                color: #777;
+                padding: 10px 0;
+            ">
+                No encounters have been recorded for this patient.
+            </div>
+
+        {% endif %}
 
     </div>
 
-</body>
-</html>
+</div>
+
+{% endblock %}
